@@ -6,7 +6,7 @@ from tiles import *
 from objects import *
 from constants import *
 
-zoomFactor = 3
+zoomFactor = 1
 
 player_speed = 1
 
@@ -29,9 +29,11 @@ energyTileset = Tileset("resources/tileset/energy.png", zoomFactor, size=(TILE_S
 
 tilemap = StaticTilemap(tileset, size=(WORLD_HEIGHT, WORLD_WIDTH))
 cloudTilemap = StaticTilemap(cloudTileset, size=(WORLD_HEIGHT, WORLD_WIDTH))
+energyTilemap = StaticTilemap(energyTileset, size=(WORLD_HEIGHT, WORLD_WIDTH))
 
 # dynamicTilemap = DynamicTilemap(tileset, )
-tilemap.loadFromCsv("firstIsland.csv")
+tilemap.loadFromCsv("resources/map/firstIsland.csv")
+# energyTilemap.loadFromCsv("resources/map/csv.csv")
 
 # player.pos = np.array([WORLD_WIDTH // 2, WORLD_HEIGHT // 2], dtype=float)
 camPos = player.pos
@@ -44,10 +46,14 @@ tileIndexToPlace = 1
 lastUpdated = 0
 timeCounter = 0
 
+tilemine = TileObject((14,8), energyTilemap, 'resources/map/tilemine.csv', (3, 2))
+tilemine.placeOnTilemap()
+
 # for i in range(20):
 #     objectList.append(GameObject(energyTileset.tiles[60+i].image, (5+i,5)))
-
 # Game loop
+pygame.transform.rotozoom(screen, 0, 20)
+
 while True:
     now = time.time()
     dt = now - prevTime
@@ -96,11 +102,13 @@ while True:
 
     screen.fill((201, 225, 229))
     tilemap.render(viewport, screen, zoomFactor)
+    energyTilemap.render(viewport, screen, zoomFactor)
+
 
     # dynamicTilemap.update(viewport)
     # dynamicTilemap.render(screen, viewport)
 
-    render_objects(objectList, viewport, screen, zoomFactor)
+    renderObjects(objectList, viewport, screen, zoomFactor)
 
     # player_screen_x = int((player.pos[0] * zoomedTileSize - camPos[0] * zoomedTileSize) + SCREEN_WIDTH / 2)
     # player_screen_y = int((player.pos[1] * zoomedTileSize - camPos[1] * zoomedTileSize) + SCREEN_HEIGHT / 2)
