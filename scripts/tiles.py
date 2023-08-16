@@ -47,20 +47,28 @@ class StaticTilemap:
                 for j, tileIndex in enumerate(row):
                     self.map[i, j] = int(tileIndex)
 
-    def render(self, viewport, screen, zoomFactor):
-        start_x = max(0, viewport.left // (TILE_SIZE*zoomFactor))
-        end_x = min(self.size[0], start_x + viewport.width // TILE_SIZE*zoomFactor + 2)
-        start_y = max(0, viewport.top // (TILE_SIZE*zoomFactor))
-        end_y = min(self.size[1], start_y + viewport.height // TILE_SIZE*zoomFactor + 2)
-        for i in range(start_y, end_y):
-            for j in range(start_x, end_x):
-                if self.map[i,j] <= 0:
-                    continue
+    def render(self, screen, viewport, chunkSize=(5, 5), zoomFactor=1):
 
-                tile = self.tileset.tiles[self.map[i, j]]
-                # newSize = (int(tile.get_width() * zoomFactor), int(tile.get_height() * zoomFactor))
-                # upscaledTile = pygame.transform.scale(tile, newSize)
-                screen.blit(tile, ((j * TILE_SIZE*zoomFactor) - viewport.left, (i * TILE_SIZE*zoomFactor) - viewport.top))
+        startChunkX = viewport.left // (chunkSize[0] * TILE_SIZE * zoomFactor)
+        endChunkX = (viewport.right // (chunkSize[0] * TILE_SIZE * zoomFactor)) + 1
+        startChunkY = viewport.top // (chunkSize[1] * TILE_SIZE * zoomFactor)
+        endChunkY = (viewport.bottom // (chunkSize[1] * TILE_SIZE * zoomFactor)) + 1
+
+        for chunkX in range(startChunkX, endChunkX):
+            for chunkY in range(startChunkY, endChunkY):
+                startX = chunkX * chunkSize[0]
+                endX = startX + chunkSize[0]
+                startY = chunkY * chunkSize[1]
+                endY = startY + chunkSize[1]
+
+                for i in range(startY, endY):
+                    for j in range(startX, endX):
+                        if self.map[i, j] <= 0:
+                            continue
+
+                        tile = self.tileset.tiles[self.map[i, j]]
+                        screen.blit(tile, (
+                        (j * TILE_SIZE * zoomFactor) - viewport.left, (i * TILE_SIZE * zoomFactor) - viewport.top))
 
     def set_random(self):
         n = len(self.tileset.tiles)

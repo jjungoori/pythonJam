@@ -5,13 +5,24 @@ import csv
 
 
 class GameObject(pygame.sprite.Sprite):
-    def __init__(self, image_path, position, images = []):
+    def __init__(self, animation, position):
         pygame.sprite.Sprite.__init__(self)
-        self.image = pygame.image.load(image_path)
         self.pos = np.array(position, dtype=float)
 
-        self.images = [*map(lambda x : pygame.image.load(x), images)]
-        self.imageNum = 0
+        self.animation = animation
+
+    def update(self):
+        self.animation.update()
+
+    def render(self, screen, viewport):
+        # objectScreen_x = int(game_object.pos[0] * zoomedTileSize - viewport.left)
+        # objectScreen_y = int(game_object.pos[1] * zoomedTileSize - viewport.top)
+        #
+        # scaledImageWidth = int(game_object.image.get_width() * zoomFactor)
+        # scaledImageHeight = int(game_object.image.get_height() * zoomFactor)
+        # scaledImage = pygame.transform.scale(game_object.image, (scaledImageWidth, scaledImageHeight))
+
+        screen.blit(self.animation.img(), self.pos-(viewport.top, viewport.left))
 
 def updateObjects(object_list):
 

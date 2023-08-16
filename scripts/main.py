@@ -5,114 +5,98 @@ import time
 from tiles import *
 from objects import *
 from constants import *
-
-zoomFactor = 1
-
-player_speed = 1
-
-pygame.init()
-
-screen = pygame.display.set_mode((SCREEN_WIDTH, SCREEN_HEIGHT))
-
-player = GameObject("resources/entity/player/player1.png", [5, 5], [
-    "resources/entity/player/player1.png",
-    "resources/entity/player/player2.png"
-])
-
-# object2 = GameObject("dog.png", [WORLD_WIDTH // 3, WORLD_HEIGHT // 3])
-
-objectList = [player]
-
-tileset = Tileset("resources/tileset/tileset.png", zoomFactor, size=(TILE_SIZE, TILE_SIZE))
-cloudTileset = Tileset("resources/tileset/cloud.png", zoomFactor, size=(TILE_SIZE, TILE_SIZE))
-energyTileset = Tileset("resources/tileset/energy.png", zoomFactor, size=(TILE_SIZE, TILE_SIZE))
-
-tilemap = StaticTilemap(tileset, size=(WORLD_HEIGHT, WORLD_WIDTH))
-cloudTilemap = StaticTilemap(cloudTileset, size=(WORLD_HEIGHT, WORLD_WIDTH))
-energyTilemap = StaticTilemap(energyTileset, size=(WORLD_HEIGHT, WORLD_WIDTH))
-
-# dynamicTilemap = DynamicTilemap(tileset, )
-tilemap.loadFromCsv("resources/map/firstIsland.csv")
-# energyTilemap.loadFromCsv("resources/map/csv.csv")
-
-# player.pos = np.array([WORLD_WIDTH // 2, WORLD_HEIGHT // 2], dtype=float)
-camPos = player.pos
-
-prevTime = time.time()
-
-dragging = False
-tileIndexToPlace = 1
-
-lastUpdated = 0
-timeCounter = 0
-
-tilemine = TileObject((14,8), energyTilemap, 'resources/map/tilemine.csv', (3, 2))
-tilemine.placeOnTilemap()
-
-# for i in range(20):
-#     objectList.append(GameObject(energyTileset.tiles[60+i].image, (5+i,5)))
-# Game loop
-pygame.transform.rotozoom(screen, 0, 20)
-
-while True:
-    now = time.time()
-    dt = now - prevTime
-    prevTime = now
-
-    timeCounter += dt
-
-    zoomedTileSize = TILE_SIZE * zoomFactor
-
-    if timeCounter - lastUpdated >= 0.5:
-        updateObjects(objectList)
-        lastUpdated = timeCounter
-
-    for event in pygame.event.get():
-        if event.type == pygame.QUIT:
-            pygame.quit()
-            sys.exit()
-        elif event.type == pygame.KEYDOWN:
-            if event.key == pygame.K_LEFT:
-                player.pos[0] = max(0, player.pos[0] - player_speed)
-            elif event.key == pygame.K_RIGHT:
-                player.pos[0] = min(WORLD_WIDTH - 1, player.pos[0] + player_speed)
-            elif event.key == pygame.K_UP:
-                player.pos[1] = max(0, player.pos[1] - player_speed)
-            elif event.key == pygame.K_DOWN:
-                player.pos[1] = min(WORLD_HEIGHT - 1, player.pos[1] + player_speed)
-            # if event.type == pygame.MOUSEBUTTONDOWN:
-            #     dragging = True
-            # elif event.type == pygame.MOUSEBUTTONUP:
-            #     dragging = False
-            # elif event.type == pygame.MOUSEMOTION and dragging:
-            #     x, y = event.pos
-            #     i = (x + viewport.left) // TILE_SIZE
-            #     j = (y + viewport.top) // TILE_SIZE
-            #     dynamicTilemap.placeTile(i, j, tileIndexToPlace)
+from utils import *
 
 
-    #render
-    camPos = (1 - CAM_LERP_SPEED * dt) * camPos + CAM_LERP_SPEED * dt * player.pos
+class Game:
+    def __init__(self):
+        pygame.init()
 
-    viewport_x = int(camPos[0] * zoomedTileSize - SCREEN_WIDTH / 2 + zoomedTileSize / 2)
-    viewport_y = int(camPos[1] * zoomedTileSize - SCREEN_HEIGHT / 2 + zoomedTileSize / 2)
-    viewportWidth = int(SCREEN_WIDTH)
-    viewportHeight = int(SCREEN_HEIGHT)
-    viewport = pygame.Rect(viewport_x, viewport_y, viewportWidth, viewportHeight)
+        pygame.display.set_caption('Elemental Sky')
+        self.screen = pygame.display.set_mode((SCREEN_WIDTH, SCREEN_HEIGHT))
+        self.display = pygame.Surface((SCREEN_WIDTH, SCREEN_HEIGHT))
 
-    screen.fill((201, 225, 229))
-    tilemap.render(viewport, screen, zoomFactor)
-    energyTilemap.render(viewport, screen, zoomFactor)
+        self.zoomFactor = 1
+        self.player_speed = 1
+
+        self.viewport = pygame.Rect(0, 0, SCREEN_WIDTH, SCREEN_HEIGHT)  # Define viewport here
+
+        self.clock = pygame.time.Clock()
+        self.movement = [False, False]
+
+        self.assets = {
+            'player/idle': Animation(load_images('resources/entity/player'), img_dur=2),
+        }
+        self.tilemaps = {
+            'main': StaticTilemap(
+                Tileset("resources/tileset/tileset.png", self.zoomFactor, size=(TILE_SIZE, TILE_SIZE)),
+                size=(WORLD_HEIGHT, WORLD_WIDTH)),
+            'object': StaticTilemap(
+                Tileset("resources/tileset/energy.png", self.zoomFactor, size=(TILE_SIZE, TILE_SIZE)),
+                size=(WORLD_HEIGHT, WORLD_WIDTH))
+        }
+
+        self.player = GameObject(Animation(load_images('resources/entity/player')), [5, 5]),
+
+        self.objects = [
+
+        ]
+
+        self.load()
+        self.run()
+
+    def load(self):
+        self.tilemaps['main'].loadFromCsv('resources/map/firstIsland.csv')
+
+    def run(self):
+        prevTime = time.time()
+        dragging = False
+        lastUpdated = 0
+        timeCounter = 0
+
+        while True:
+            now = time.time()
+            dt = now - prevTime
+            prevTime = now
+            timeCounter += dt
+            # zoomedTileSize = TILE_SIZE * self.zoomFactor
+
+            # Update logic here
+
+            for event in pygame.event.get():
+                if event.type == pygame.QUIT:
+                    pygame.quit()
+                    sys.exit()
+                elif event.type == pygame.KEYDOWN:
+                    if event.key == pygame.K_LEFT:
+                        self.movement[0] = True
+                    elif event.key == pygame.K_RIGHT:
+                        self.movement[1] = True
+                    elif event.key == pygame.K_UP:
+                        # Add additional logic for the UP key here
+                        pass
+                    elif event.key == pygame.K_DOWN:
+                        # Add additional logic for the DOWN key here
+                        pass
+                elif event.type == pygame.KEYUP:
+                    if event.key == pygame.K_LEFT:
+                        self.movement[0] = False
+                    if event.key == pygame.K_RIGHT:
+                        self.movement[1] = False
+
+            self.player[0].update()
+            self.player[0].render(self.screen, self.viewport)
+
+            for i in self.objects:
+                i.update()
+                i.render(self.screen, self.viewport)
+            for i in self.tilemaps:
+                self.tilemaps[i].render(self.screen,
+                                                self.viewport)
+
+            pygame.display.update()
+            self.clock.tick(60)
 
 
-    # dynamicTilemap.update(viewport)
-    # dynamicTilemap.render(screen, viewport)
-
-    renderObjects(objectList, viewport, screen, zoomFactor)
-
-    # player_screen_x = int((player.pos[0] * zoomedTileSize - camPos[0] * zoomedTileSize) + SCREEN_WIDTH / 2)
-    # player_screen_y = int((player.pos[1] * zoomedTileSize - camPos[1] * zoomedTileSize) + SCREEN_HEIGHT / 2)
-    # pygame.draw.circle(screen, (0, 0, 255), (player_screen_x, player_screen_y), zoomedTileSize // 2)
-
-    pygame.display.flip()
-
+if __name__ == "__main__":
+    Game()
