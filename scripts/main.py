@@ -14,9 +14,9 @@ pygame.init()
 
 screen = pygame.display.set_mode((SCREEN_WIDTH, SCREEN_HEIGHT))
 
-player = GameObject("resources/player1.png", [5, 5], [
-    "resources/player1.png",
-    "resources/player2.png"
+player = GameObject("resources/entity/player/player1.png", [5, 5], [
+    "resources/entity/player/player1.png",
+    "resources/entity/player/player2.png"
 ])
 
 # object2 = GameObject("dog.png", [WORLD_WIDTH // 3, WORLD_HEIGHT // 3])
