@@ -9,7 +9,7 @@ class Tileset:
         self.size = size
         self.margin = margin
         self.spacing = spacing
-        self.image = pygame.image.load(file).convert_alpha() # Ensure the image has an alpha channel
+        self.image = file # Ensure the image has an alpha channel
         self.rect = self.image.get_rect()
         self.tiles = []
         self.tileImagePaths = []
@@ -68,7 +68,7 @@ class StaticTilemap:
 
                         tile = self.tileset.tiles[self.map[i, j]]
                         screen.blit(tile, (
-                        (j * TILE_SIZE * zoomFactor) - viewport.left, (i * TILE_SIZE * zoomFactor) - viewport.top))
+                        (j * TILE_SIZE * zoomFactor) - viewport.top, (i * TILE_SIZE * zoomFactor) - viewport.left) )
 
     def set_random(self):
         n = len(self.tileset.tiles)

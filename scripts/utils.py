@@ -2,7 +2,7 @@ import os
 
 import pygame
 
-BASE_IMG_PATH = ''
+BASE_IMG_PATH = '../resources/'
 
 
 def load_image(path):

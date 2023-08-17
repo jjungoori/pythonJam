@@ -16,27 +16,28 @@ class Game:
         self.screen = pygame.display.set_mode((SCREEN_WIDTH, SCREEN_HEIGHT))
         self.display = pygame.Surface((SCREEN_WIDTH, SCREEN_HEIGHT))
 
-        self.zoomFactor = 1
+        self.zoomFactor = 2
         self.player_speed = 1
 
         self.viewport = pygame.Rect(0, 0, SCREEN_WIDTH, SCREEN_HEIGHT)  # Define viewport here
+        self.camPos = np.array((0,0), dtype=float)
 
         self.clock = pygame.time.Clock()
-        self.movement = [False, False]
+        self.movement = [False, False, False, False]
 
         self.assets = {
-            'player/idle': Animation(load_images('resources/entity/player'), img_dur=2),
+            'player/idle': Animation(load_images('entity/player'), img_dur=2),
         }
         self.tilemaps = {
             'main': StaticTilemap(
-                Tileset("resources/tileset/tileset.png", self.zoomFactor, size=(TILE_SIZE, TILE_SIZE)),
+                Tileset(load_image("tileset/tileset.png"), self.zoomFactor, size=(TILE_SIZE, TILE_SIZE)),
                 size=(WORLD_HEIGHT, WORLD_WIDTH)),
             'object': StaticTilemap(
-                Tileset("resources/tileset/energy.png", self.zoomFactor, size=(TILE_SIZE, TILE_SIZE)),
+                Tileset(load_image("tileset/energy.png"), self.zoomFactor, size=(TILE_SIZE, TILE_SIZE)),
                 size=(WORLD_HEIGHT, WORLD_WIDTH))
         }
 
-        self.player = GameObject(Animation(load_images('resources/entity/player')), [5, 5]),
+        self.player = GameObject(Animation(load_images('entity/player')), (5, 5)),
 
         self.objects = [
 
@@ -46,7 +47,7 @@ class Game:
         self.run()
 
     def load(self):
-        self.tilemaps['main'].loadFromCsv('resources/map/firstIsland.csv')
+        self.tilemaps['main'].loadFromCsv('../resources/map/firstIsland.csv')
 
     def run(self):
         prevTime = time.time()
@@ -55,6 +56,9 @@ class Game:
         timeCounter = 0
 
         while True:
+            self.screen.fill((0, 0, 0, 0))
+            self.display.fill((0, 0, 0, 0))
+
             now = time.time()
             dt = now - prevTime
             prevTime = now
@@ -73,26 +77,72 @@ class Game:
                     elif event.key == pygame.K_RIGHT:
                         self.movement[1] = True
                     elif event.key == pygame.K_UP:
-                        # Add additional logic for the UP key here
+                        self.movement[2] = True
                         pass
                     elif event.key == pygame.K_DOWN:
-                        # Add additional logic for the DOWN key here
+                        self.movement[3] = True
                         pass
                 elif event.type == pygame.KEYUP:
                     if event.key == pygame.K_LEFT:
                         self.movement[0] = False
                     if event.key == pygame.K_RIGHT:
                         self.movement[1] = False
+                    if event.key == pygame.K_UP:
+                        self.movement[2] = False
+                        pass
+                    if event.key == pygame.K_DOWN:
+                        self.movement[3] = False
+                        pass
 
-            self.player[0].update()
-            self.player[0].render(self.screen, self.viewport)
+            if self.movement[0]:
+                self.player[0].pos[0] -= 1
+            if self.movement[1]:
+                self.player[0].pos[0] += 1
+            if self.movement[2]:
+                self.player[0].pos[1] -= 1
+            if self.movement[3]:
+                self.player[0].pos[1] += 1
 
             for i in self.objects:
                 i.update()
-                i.render(self.screen, self.viewport)
+                i.render(self.display, self.viewport)
             for i in self.tilemaps:
-                self.tilemaps[i].render(self.screen,
+                self.tilemaps[i].render(self.display,
                                                 self.viewport)
+            self.screen.blit(self.display, (0,0))
+            # zoomRect = pygame.Rect(SCREEN_WIDTH // 4, SCREEN_HEIGHT // 4, SCREEN_WIDTH // 2, SCREEN_HEIGHT // 2)
+            #
+            # # Capture the area you want to zoom
+            # capturedArea = self.screen.subsurface(zoomRect)
+            #
+            # # Scale the captured area based on the zoom factor
+            # zoomedArea = pygame.transform.scale(capturedArea, (
+            # int(zoomRect.width * self.zoomFactor), int(zoomRect.height * self.zoomFactor)))
+            #
+            # # Blit the zoomed area back to the screen at the desired position
+            # self.screen.blit(zoomedArea, (zoomRect.left, zoomRect.top))
+
+            self.camPos = (1 - CAM_LERP_SPEED * dt) * self.camPos + CAM_LERP_SPEED * dt * self.player[0].pos
+
+            self.viewport.left = self.camPos[1] - (SCREEN_WIDTH / self.zoomFactor) / 2
+            self.viewport.top = self.camPos[0] - (SCREEN_HEIGHT / self.zoomFactor) / 2
+            self.viewport.width = SCREEN_WIDTH / self.zoomFactor
+            self.viewport.height = SCREEN_HEIGHT / self.zoomFactor
+
+            for i in self.objects:
+                i.update()
+                i.render(self.display, self.viewport)
+            for i in self.tilemaps:
+                self.tilemaps[i].render(self.display, self.viewport)
+            self.player[0].update()
+            self.player[0].render(self.display, self.viewport)
+
+            capturedContent = self.display.copy()
+
+            zoomedContent = pygame.transform.scale(capturedContent, (
+            int(SCREEN_WIDTH * self.zoomFactor), int(SCREEN_HEIGHT * self.zoomFactor)))
+
+            self.screen.blit(zoomedContent, (0, 0))
 
             pygame.display.update()
             self.clock.tick(60)
