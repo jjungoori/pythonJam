@@ -2,10 +2,10 @@ import pygame
 import sys
 import numpy as np
 import time
-from tiles import *
-from objects import *
-from constants import *
-from utils import *
+from scripts.tiles import *
+from scripts.objects import *
+from scripts.constants import *
+from scripts.utils import *
 
 
 class Game:
@@ -26,14 +26,14 @@ class Game:
         self.movement = [False, False, False, False]
 
         self.assets = {
-            'player/idle': Animation(load_images('entity/player'), img_dur=2),
+            'player/idle': Animation(load_images('entity/player'), img_dur=5),
         }
         self.tilemaps = {
             'main': StaticTilemap(
-                Tileset(load_image("tileset/tileset.png"), self.zoomFactor, size=(TILE_SIZE, TILE_SIZE)),
+                Tileset(load_image("tileset/tileset.png"), size=(TILE_SIZE, TILE_SIZE)),
                 size=(WORLD_HEIGHT, WORLD_WIDTH)),
             'object': StaticTilemap(
-                Tileset(load_image("tileset/energy.png"), self.zoomFactor, size=(TILE_SIZE, TILE_SIZE)),
+                Tileset(load_image("tileset/energy.png"), size=(TILE_SIZE, TILE_SIZE)),
                 size=(WORLD_HEIGHT, WORLD_WIDTH))
         }
 
@@ -47,7 +47,7 @@ class Game:
         self.run()
 
     def load(self):
-        self.tilemaps['main'].loadFromCsv('../resources/map/firstIsland.csv')
+        self.tilemaps['main'].loadFromCsv('map/firstIsland.csv')
 
     def run(self):
         prevTime = time.time()
@@ -124,10 +124,10 @@ class Game:
 
             self.camPos = (1 - CAM_LERP_SPEED * dt) * self.camPos + CAM_LERP_SPEED * dt * self.player[0].pos
 
-            self.viewport.left = self.camPos[1] - (SCREEN_WIDTH / self.zoomFactor) / 2
-            self.viewport.top = self.camPos[0] - (SCREEN_HEIGHT / self.zoomFactor) / 2
-            self.viewport.width = SCREEN_WIDTH / self.zoomFactor
-            self.viewport.height = SCREEN_HEIGHT / self.zoomFactor
+            self.viewport.left = self.camPos[1] - (SCREEN_HEIGHT / self.zoomFactor) / 2
+            self.viewport.top = self.camPos[0] - (SCREEN_WIDTH / self.zoomFactor) / 2
+            # self.viewport.width = SCREEN_WIDTH / self.zoomFactor
+            # self.viewport.height = SCREEN_HEIGHT / self.zoomFactor
 
             for i in self.objects:
                 i.update()
@@ -143,10 +143,10 @@ class Game:
             int(SCREEN_WIDTH * self.zoomFactor), int(SCREEN_HEIGHT * self.zoomFactor)))
 
             self.screen.blit(zoomedContent, (0, 0))
-
+            # self.screen.blit(self.display, (0,0))
             pygame.display.update()
             self.clock.tick(60)
 
 
 if __name__ == "__main__":
-    Game()
+    g = Game()

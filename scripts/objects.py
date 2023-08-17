@@ -1,6 +1,6 @@
 import pygame
 import numpy as np
-from constants import *
+from scripts.constants import *
 import csv
 
 
@@ -23,29 +23,6 @@ class GameObject(pygame.sprite.Sprite):
         # scaledImage = pygame.transform.scale(game_object.image, (scaledImageWidth, scaledImageHeight))
 
         screen.blit(self.animation.img(), self.pos-(viewport.top, viewport.left))
-
-def updateObjects(object_list):
-
-    for game_object in object_list:
-        if game_object.images:
-            game_object.imageNum += 1
-            if game_object.imageNum >= len(game_object.images):
-                game_object.imageNum = 0
-            game_object.image = game_object.images[game_object.imageNum]
-
-
-def renderObjects(objectList, viewport, screen, zoomFactor):
-    zoomedTileSize = TILE_SIZE * zoomFactor
-    for game_object in objectList:
-
-        objectScreen_x = int(game_object.pos[0] * zoomedTileSize - viewport.left)
-        objectScreen_y = int(game_object.pos[1] * zoomedTileSize - viewport.top)
-
-        scaledImageWidth = int(game_object.image.get_width() * zoomFactor)
-        scaledImageHeight = int(game_object.image.get_height() * zoomFactor)
-        scaledImage = pygame.transform.scale(game_object.image, (scaledImageWidth, scaledImageHeight))
-
-        screen.blit(scaledImage, (objectScreen_x, objectScreen_y))
 
 class TileObject:
     def __init__(self, pos, targetTilemap, csvStructure, size):

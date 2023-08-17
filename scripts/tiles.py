@@ -1,10 +1,10 @@
 import pygame
 import numpy as np
-from constants import *
+from scripts.constants import *
 import csv
 
 class Tileset:
-    def __init__(self, file, zoomFactor, size=(16, 16), margin=0, spacing=0):
+    def __init__(self, file, size=(16, 16), margin=0, spacing=0):
         self.file = file
         self.size = size
         self.margin = margin
@@ -13,9 +13,9 @@ class Tileset:
         self.rect = self.image.get_rect()
         self.tiles = []
         self.tileImagePaths = []
-        self.load(zoomFactor)
+        self.load()
 
-    def load(self, zoomFactor):
+    def load(self):
         self.tiles = []
         self.tileImagePaths = []
         x0 = y0 = self.margin
@@ -27,9 +27,7 @@ class Tileset:
             for x in range(x0, w, dx):
                 tile = pygame.Surface(self.size, pygame.SRCALPHA) # Create a surface with an alpha channel
                 tile.blit(self.image, (0, 0), (x, y, *self.size))
-                newSize = (int(tile.get_width() * zoomFactor), int(tile.get_height() * zoomFactor))
-                upscaledTile = pygame.transform.scale(tile, newSize)
-                self.tiles.append(upscaledTile)
+                self.tiles.append(tile)
 
                 # tileImagePath = f'resources/structure/tile_image{x}_{y}.png'
                 # pygame.image.save(tile, tileImagePath)
@@ -41,13 +39,15 @@ class StaticTilemap:
         self.map = np.zeros(size, dtype=int)
 
     def loadFromCsv(self, csvFilePath):
-        with open(csvFilePath, 'r') as file:
+        with open(BASE_IMG_PATH + csvFilePath, 'r') as file:
             reader = csv.reader(file)
             for i, row in enumerate(reader):
                 for j, tileIndex in enumerate(row):
                     self.map[i, j] = int(tileIndex)
 
     def render(self, screen, viewport, chunkSize=(5, 5), zoomFactor=1):
+
+        zoomFactor = 1
 
         startChunkX = viewport.left // (chunkSize[0] * TILE_SIZE * zoomFactor)
         endChunkX = (viewport.right // (chunkSize[0] * TILE_SIZE * zoomFactor)) + 1

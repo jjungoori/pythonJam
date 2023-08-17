@@ -1,8 +1,7 @@
 import os
-
+import csv
 import pygame
-
-BASE_IMG_PATH = '../resources/'
+from scripts.constants import BASE_IMG_PATH
 
 
 def load_image(path):
@@ -16,7 +15,6 @@ def load_images(path):
     for img_name in sorted(os.listdir(BASE_IMG_PATH + path)):
         images.append(load_image(path + '/' + img_name))
     return images
-
 
 class Animation:
     def __init__(self, images, img_dur=5, loop=True):
