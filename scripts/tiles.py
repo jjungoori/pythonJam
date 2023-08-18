@@ -45,7 +45,7 @@ class StaticTilemap:
                 for j, tileIndex in enumerate(row):
                     self.map[i, j] = int(tileIndex)
 
-    def render(self, screen, viewport, chunkSize=(5, 5), zoomFactor=1):
+    def render(self, screen, viewport, chunkSize=(20, 20), zoomFactor=1):
 
         zoomFactor = 1
 

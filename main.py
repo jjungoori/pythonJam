@@ -1,3 +1,5 @@
+import random
+
 import pygame
 import sys
 import numpy as np
@@ -6,6 +8,7 @@ from scripts.tiles import *
 from scripts.objects import *
 from scripts.constants import *
 from scripts.utils import *
+from scripts.particle import *
 
 
 class Game:
@@ -38,7 +41,9 @@ class Game:
         }
 
         self.player = GameObject(Animation(load_images('entity/player')), (5, 5)),
+        self.particles = [
 
+        ]
         self.objects = [
 
         ]
@@ -55,6 +60,7 @@ class Game:
         lastUpdated = 0
         timeCounter = 0
 
+        targetZoom = self.zoomFactor
         while True:
             self.screen.fill((0, 0, 0, 0))
             self.display.fill((0, 0, 0, 0))
@@ -93,6 +99,17 @@ class Game:
                     if event.key == pygame.K_DOWN:
                         self.movement[3] = False
                         pass
+                if event.type == pygame.KEYDOWN:
+                    if event.key == pygame.K_q:
+                        for i in range(50):
+                            self.particles.append(
+                                Particle(self.player[0].pos, ((random.random() - 0.5) * 20, (random.random() - 0.5) * 20),
+                                         5.0, random.random()+0.01, (random.random()*255, random.random()*255, random.random()*255), 0, 0))
+
+                        # targetZoom += 0.5
+                    elif event.key == pygame.K_w:
+                        # targetZoom -= 0.5
+                        pass
 
             if self.movement[0]:
                 self.player[0].pos[0] -= 1
@@ -122,10 +139,11 @@ class Game:
             # # Blit the zoomed area back to the screen at the desired position
             # self.screen.blit(zoomedArea, (zoomRect.left, zoomRect.top))
 
+            self.zoomFactor = (1 - CAM_LERP_SPEED * dt) * self.zoomFactor + CAM_LERP_SPEED * dt * targetZoom
             self.camPos = (1 - CAM_LERP_SPEED * dt) * self.camPos + CAM_LERP_SPEED * dt * self.player[0].pos
 
-            self.viewport.left = self.camPos[1] - (SCREEN_HEIGHT / self.zoomFactor) / 2
-            self.viewport.top = self.camPos[0] - (SCREEN_WIDTH / self.zoomFactor) / 2
+            self.viewport.left = self.camPos[1] - (SCREEN_HEIGHT / self.zoomFactor) / 2 + TILE_SIZE/2
+            self.viewport.top = self.camPos[0] - (SCREEN_WIDTH / self.zoomFactor) / 2 + TILE_SIZE/2
             # self.viewport.width = SCREEN_WIDTH / self.zoomFactor
             # self.viewport.height = SCREEN_HEIGHT / self.zoomFactor
 
@@ -134,6 +152,12 @@ class Game:
                 i.render(self.display, self.viewport)
             for i in self.tilemaps:
                 self.tilemaps[i].render(self.display, self.viewport)
+            for i in self.particles:
+                if i.update():
+                    i.render(self.display, 1, 1)
+                else:
+                    self.particles.remove(i)
+
             self.player[0].update()
             self.player[0].render(self.display, self.viewport)
 
