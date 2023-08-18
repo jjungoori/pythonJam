@@ -102,11 +102,11 @@ class Game:
                         pass
                 if event.type == pygame.KEYDOWN:
                     if event.key == pygame.K_q:
-                        for i in range(20):
+                        for i in range(10):
 
                             self.particles.append(
                                 Particle(self.player[0].center(), ((random.random() - 0.5) * 10, (random.random() - 0.5) * 10),
-                                         5.0, random.random()+0.01, (random.random()*255, random.random()*255, random.random()*255), 0, 0.5))
+                                         5.0, 0.2 + random.random()*0.5, (random.random()*255, random.random()*255, random.random()*255), 0, 0.5))
 
                         # targetZoom += 0.5
                     elif event.key == pygame.K_w:
