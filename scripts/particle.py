@@ -25,7 +25,8 @@ class Particle:
 
     def update(self, tiles=0, TILE_SIZE=0):
         if not self.dead and self.gravity:
-            self.velocity[1] = min(self.velocity[1] + self.gravity, 3)
+            self.velocity[1] = min(self.velocity[1] + self.gravity, 10)
+            self.velocity[0] *= 0.9
         else:
             self.velocity[0] *= 0.9
             self.velocity[1] *= 0.9
@@ -52,7 +53,7 @@ class Particle:
 
         return True
 
-    def render(self, display, height, BLEND_RGBA_ADD):
-        display.blit(glow_img(int(self.size * 1.5 + 2), (int(self.color[0] / 2), int(self.color[1] / 2), int(self.color[2] / 2))), (self.position[0] - self.size * 2, self.position[1] + height - self.size * 2), special_flags=BLEND_RGBA_ADD)
-        display.blit(glow_img(int(self.size), self.color), (self.position[0] - self.size, self.position[1] + height - self.size), special_flags=BLEND_RGBA_ADD)
-        display.set_at((int(self.position[0]), int(self.position[1] + height)), (255, 255, 255))
+    def render(self, display, viewport, height, BLEND_RGBA_ADD):
+        display.blit(glow_img(int(self.size * 1.5 + 2), (int(self.color[0] / 2), int(self.color[1] / 2), int(self.color[2] / 2))), (self.position[0] - self.size * 2 - viewport.top, self.position[1] + height - self.size * 2 - viewport.left), special_flags=BLEND_RGBA_ADD)
+        display.blit(glow_img(int(self.size), self.color), (self.position[0] - self.size - viewport.top, self.position[1] + height - self.size - viewport.left), special_flags=BLEND_RGBA_ADD)
+        display.set_at((int(self.position[0]) - viewport.top, int(self.position[1] + height)- viewport.left), (255, 255, 255))

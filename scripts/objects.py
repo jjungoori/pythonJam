@@ -11,6 +11,9 @@ class GameObject(pygame.sprite.Sprite):
 
         self.animation = animation
 
+    def center(self):
+        return  self.pos + (TILE_SIZE/2, TILE_SIZE/2)
+
     def update(self):
         self.animation.update()
 

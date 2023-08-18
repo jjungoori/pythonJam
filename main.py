@@ -40,7 +40,7 @@ class Game:
                 size=(WORLD_HEIGHT, WORLD_WIDTH))
         }
 
-        self.player = GameObject(Animation(load_images('entity/player')), (5, 5)),
+        self.player = GameObject(Animation(load_images('entity/player')), (220, 120)),
         self.particles = [
 
         ]
@@ -55,6 +55,7 @@ class Game:
         self.tilemaps['main'].loadFromCsv('map/firstIsland.csv')
 
     def run(self):
+
         prevTime = time.time()
         dragging = False
         lastUpdated = 0
@@ -101,10 +102,11 @@ class Game:
                         pass
                 if event.type == pygame.KEYDOWN:
                     if event.key == pygame.K_q:
-                        for i in range(50):
+                        for i in range(20):
+
                             self.particles.append(
-                                Particle(self.player[0].pos, ((random.random() - 0.5) * 20, (random.random() - 0.5) * 20),
-                                         5.0, random.random()+0.01, (random.random()*255, random.random()*255, random.random()*255), 0, 0))
+                                Particle(self.player[0].center(), ((random.random() - 0.5) * 10, (random.random() - 0.5) * 10),
+                                         5.0, random.random()+0.01, (random.random()*255, random.random()*255, random.random()*255), 0, 0.5))
 
                         # targetZoom += 0.5
                     elif event.key == pygame.K_w:
@@ -154,7 +156,7 @@ class Game:
                 self.tilemaps[i].render(self.display, self.viewport)
             for i in self.particles:
                 if i.update():
-                    i.render(self.display, 1, 1)
+                    i.render(self.display, self.viewport, 1, 1)
                 else:
                     self.particles.remove(i)
 
