@@ -25,8 +25,7 @@ class Particle:
 
     def update(self, tiles=0, TILE_SIZE=0):
         if not self.dead and self.gravity:
-            self.velocity[1] = min(self.velocity[1] + self.gravity, 10)
-            self.velocity[0] *= 0.9
+            self.velocity[1] = min(self.velocity[1] + self.gravity, 3)
         else:
             self.velocity[0] *= 0.9
             self.velocity[1] *= 0.9

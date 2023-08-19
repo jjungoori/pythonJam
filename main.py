@@ -1,6 +1,7 @@
 import random
 
 import pygame
+import pygame_gui
 import sys
 import numpy as np
 import time
@@ -18,6 +19,7 @@ class Game:
         pygame.display.set_caption('Elemental Sky')
         self.screen = pygame.display.set_mode((SCREEN_WIDTH, SCREEN_HEIGHT))
         self.display = pygame.Surface((SCREEN_WIDTH, SCREEN_HEIGHT))
+        self.ui = pygame_gui.UIManager((SCREEN_WIDTH,SCREEN_HEIGHT))
 
         self.zoomFactor = 2
         self.player_speed = 1
@@ -40,13 +42,21 @@ class Game:
                 size=(WORLD_HEIGHT, WORLD_WIDTH))
         }
 
-        self.player = GameObject(Animation(load_images('entity/player')), (220, 120)),
+        self.player = GameObject(Animation(load_images('entity/player')), (5, 5)),
         self.particles = [
 
         ]
         self.objects = [
 
         ]
+        self.tileObjects = [
+            TileObject((10,10), self.tilemaps['object'], 'resources/map/tilemine.csv', (10,10))
+        ]
+        self.UIs = {
+            # 'panel' : pygame_gui.elements.UIPanel(relative_rect = pygame.Rect(100,100,100,100), starting_height=1000, manager = self.ui),
+            'button' : pygame_gui.elements.UIButton(relative_rect= (0,0), text = "hello", manager = self.ui),
+            'textBox' : pygame_gui.elements.UITextBox(relative_rect=pygame.Rect(100,100,100,50), html_text="hello", manager=self.ui),
+        }
 
         self.load()
         self.run()
@@ -54,14 +64,19 @@ class Game:
     def load(self):
         self.tilemaps['main'].loadFromCsv('map/firstIsland.csv')
 
-    def run(self):
+        for i in self.tileObjects:
+            i.loadStructureFromCsv()
+            i.placeOnTilemap()
 
+    def run(self):
         prevTime = time.time()
         dragging = False
         lastUpdated = 0
         timeCounter = 0
 
         targetZoom = self.zoomFactor
+
+
         while True:
             self.screen.fill((0, 0, 0, 0))
             self.display.fill((0, 0, 0, 0))
@@ -102,16 +117,18 @@ class Game:
                         pass
                 if event.type == pygame.KEYDOWN:
                     if event.key == pygame.K_q:
-                        for i in range(10):
-
+                        for i in range(50):
                             self.particles.append(
-                                Particle(self.player[0].center(), ((random.random() - 0.5) * 10, (random.random() - 0.5) * 10),
-                                         5.0, 0.2 + random.random()*0.5, (random.random()*255, random.random()*255, random.random()*255), 0, 0.5))
+                                Particle(self.player[0].pos, ((random.random() - 0.5) * 20, (random.random() - 0.5) * 20),
+                                         5.0, random.random()+0.01, (random.random()*255, random.random()*255, random.random()*255), 0, 0))
 
                         # targetZoom += 0.5
                     elif event.key == pygame.K_w:
+                        self.UIs['textBox'].set_active_effect(pygame_gui.TEXT_EFFECT_BOUNCE, effect_tag='test')
+
                         # targetZoom -= 0.5
                         pass
+                self.ui.process_events(event)
 
             if self.movement[0]:
                 self.player[0].pos[0] -= 1
@@ -121,6 +138,7 @@ class Game:
                 self.player[0].pos[1] -= 1
             if self.movement[3]:
                 self.player[0].pos[1] += 1
+
 
             for i in self.objects:
                 i.update()
@@ -167,6 +185,8 @@ class Game:
 
             zoomedContent = pygame.transform.scale(capturedContent, (
             int(SCREEN_WIDTH * self.zoomFactor), int(SCREEN_HEIGHT * self.zoomFactor)))
+            self.ui.update(dt)
+            self.ui.draw_ui(zoomedContent)
 
             self.screen.blit(zoomedContent, (0, 0))
             # self.screen.blit(self.display, (0,0))

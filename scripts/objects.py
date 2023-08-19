@@ -11,12 +11,11 @@ class GameObject(pygame.sprite.Sprite):
 
         self.animation = animation
 
-    def center(self):
-        return  self.pos + (TILE_SIZE/2, TILE_SIZE/2)
-
     def update(self):
         self.animation.update()
 
+    def center(self):
+        return self.pos + (TILE_SIZE, TILE_SIZE)
     def render(self, screen, viewport):
         # objectScreen_x = int(game_object.pos[0] * zoomedTileSize - viewport.left)
         # objectScreen_y = int(game_object.pos[1] * zoomedTileSize - viewport.top)
