@@ -1,3 +1,5 @@
+import random
+
 import pygame
 import numpy as np
 from scripts.constants import *
@@ -42,7 +44,7 @@ class TileObject:
                     self.structure[i, j] = int(tileIndex)
 
     def placeOnTilemap(self):
-        print(self.structure.shape[0], self.structure.shape[1])
+        # print(self.structure.shape[0], self.structure.shape[1])
         for i in range(self.structure.shape[0]):
             for j in range(self.structure.shape[1]):
                 tileIndex = self.structure[i, j]
@@ -55,3 +57,34 @@ class TileObject:
             self.targetTilemap.map[y + self.pos[1], x + self.pos[0]] = newTileIndex
         else:
             print("Coordinates are out of bounds")
+
+class TileMine(TileObject):
+
+    def __init__(self, pos, targetTilemap, csvStructure):
+        super().__init__(pos, targetTilemap, csvStructure, (3,2))
+
+        self.tileMatch = {
+            1 : [[48, 70, 92], [115, 137, 159]],
+            0 : [[114, 136, 158], [49, 71, 93]]
+        }
+        self.tiles = np.array([[1,0],[1,0],[0,0]])
+        self.sync()
+
+    def sync(self):
+        print(self.tiles)
+        for i in range(3):
+            self.structure[i][0] = self.tileMatch[self.tiles[i][0]][0][i]
+            self.structure[i][1] = self.tileMatch[self.tiles[i][1]][1][i]
+        self.placeOnTilemap()
+    def mine(self):
+        self.tiles[2] = self.tiles[1]
+        self.tiles[1] = self.tiles[0]
+        l = random.randint(0,1)
+        if l == 0:
+            r = 1
+        else:
+            r = 0
+        self.tiles[0] = np.array([l, r], dtype=int)
+
+        self.sync()
+

@@ -50,7 +50,7 @@ class Game:
 
         ]
         self.tileObjects = [
-            TileObject((10,10), self.tilemaps['object'], 'resources/map/tilemine.csv', (10,10))
+            TileMine((14,8), self.tilemaps['object'], 'resources/map/tilemine.csv')
         ]
         self.UIs = {
             # 'panel' : pygame_gui.elements.UIPanel(relative_rect = pygame.Rect(100,100,100,100), starting_height=1000, manager = self.ui),
@@ -124,8 +124,8 @@ class Game:
 
                         # targetZoom += 0.5
                     elif event.key == pygame.K_w:
-                        self.UIs['textBox'].set_active_effect(pygame_gui.TEXT_EFFECT_BOUNCE, effect_tag='test')
-
+                        # self.UIs['textBox'].set_active_effect(pygame_gui.TEXT_EFFECT_BOUNCE, effect_tag='test')
+                        self.tileObjects[0].mine()
                         # targetZoom -= 0.5
                         pass
                 self.ui.process_events(event)
