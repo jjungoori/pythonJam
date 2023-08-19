@@ -119,7 +119,7 @@ class Game:
                     if event.key == pygame.K_q:
                         for i in range(50):
                             self.particles.append(
-                                Particle(self.player[0].pos, ((random.random() - 0.5) * 20, (random.random() - 0.5) * 20),
+                                Particle(self.player[0].center(), ((random.random() - 0.5) * 20, (random.random() - 0.5) * 20),
                                          5.0, random.random()+0.01, (random.random()*255, random.random()*255, random.random()*255), 0, 0))
 
                         # targetZoom += 0.5

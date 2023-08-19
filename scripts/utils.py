@@ -1,7 +1,7 @@
 import os
 import csv
 import pygame
-from scripts.constants import BASE_IMG_PATH
+from scripts.constants import BASE_IMG_PATH, TILE_SIZE
 
 
 def load_image(path):
@@ -15,6 +15,9 @@ def load_images(path):
     for img_name in sorted(os.listdir(BASE_IMG_PATH + path)):
         images.append(load_image(path + '/' + img_name))
     return images
+
+def tilePosToPos(pos):
+    return pos*TILE_SIZE
 
 class Animation:
     def __init__(self, images, img_dur=5, loop=True):

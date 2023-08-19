@@ -3,6 +3,7 @@ import random
 import pygame
 import numpy as np
 from scripts.constants import *
+from scripts.utils import *
 import csv
 
 
@@ -26,7 +27,10 @@ class GameObject(pygame.sprite.Sprite):
         # scaledImageHeight = int(game_object.image.get_height() * zoomFactor)
         # scaledImage = pygame.transform.scale(game_object.image, (scaledImageWidth, scaledImageHeight))
 
-        screen.blit(self.animation.img(), self.pos-(viewport.top, viewport.left))
+        objectScreenX = int(self.pos[0] - viewport.left)
+        objectScreenY = int(self.pos[1] - viewport.top)
+        screen.blit(self.animation.img(), (objectScreenX, objectScreenY))
+
 
 class TileObject:
     def __init__(self, pos, targetTilemap, csvStructure, size):
@@ -35,6 +39,8 @@ class TileObject:
         self.csvStructure = csvStructure
         self.structure = np.zeros(size, dtype=int)
         self.loadStructureFromCsv()
+        self.on = False
+
 
     def loadStructureFromCsv(self):
         with open(self.csvStructure, 'r') as file:
@@ -68,7 +74,10 @@ class TileMine(TileObject):
             0 : [[114, 136, 158], [49, 71, 93]]
         }
         self.tiles = np.array([[1,0],[1,0],[0,0]])
-        self.sync()
+        # self.sync()
+
+    def spawnTileObject(self, l):
+        l.append(GameObject(Animation(load_images('entity/spawner'), loop=True, img_dur=8), tilePosToPos((14,8))))
 
     def sync(self):
         print(self.tiles)
