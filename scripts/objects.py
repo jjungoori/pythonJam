@@ -31,6 +31,12 @@ class GameObject(pygame.sprite.Sprite):
         objectScreenY = int(self.pos[1] - viewport.top)
         screen.blit(self.animation.img(), (objectScreenX, objectScreenY))
 
+class Player(GameObject):
+    def __init__(self, animation, position):
+        super().__init__(animation, position)
+    def render(self, screen, viewport):
+        screen.blit(self.animation.img(), self.pos - (viewport.top, viewport.left))
+
 
 class TileObject:
     def __init__(self, pos, targetTilemap, csvStructure, size):

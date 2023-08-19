@@ -21,7 +21,7 @@ class Game:
         self.display = pygame.Surface((SCREEN_WIDTH, SCREEN_HEIGHT))
         self.ui = pygame_gui.UIManager((SCREEN_WIDTH,SCREEN_HEIGHT))
 
-        self.zoomFactor = 2
+        self.zoomFactor = 3
         self.player_speed = 1
 
         self.viewport = pygame.Rect(0, 0, SCREEN_WIDTH, SCREEN_HEIGHT)  # Define viewport here
@@ -42,7 +42,7 @@ class Game:
                 size=(WORLD_HEIGHT, WORLD_WIDTH))
         }
 
-        self.player = GameObject(Animation(load_images('entity/player')), (5, 5)),
+        self.player = Player(Animation(load_images('entity/player')), (5, 5)),
         self.particles = [
 
         ]
