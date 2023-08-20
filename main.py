@@ -10,15 +10,16 @@ from scripts.objects import *
 from scripts.constants import *
 from scripts.utils import *
 from scripts.particle import *
+from scripts.renderer import *
+from  scripts.timer import *
+
 
 
 class Game:
     def __init__(self):
-        pygame.init()
 
-        pygame.display.set_caption('Elemental Sky')
-        self.screen = pygame.display.set_mode((SCREEN_WIDTH, SCREEN_HEIGHT))
-        self.display = pygame.Surface((SCREEN_WIDTH, SCREEN_HEIGHT))
+        self.renderer = Renderer()
+
         self.ui = pygame_gui.UIManager((SCREEN_WIDTH,SCREEN_HEIGHT))
 
         self.zoomFactor = 3
@@ -31,7 +32,7 @@ class Game:
         self.movement = [False, False, False, False]
 
         self.assets = {
-            'player/idle': Animation(load_images('entity/player'), img_dur=5),
+            'player/idle': Animation(load_images('entity/player'), img_dur=10),
         }
         self.tilemaps = {
             'main': StaticTilemap(
@@ -41,8 +42,9 @@ class Game:
                 Tileset(load_image("tileset/energy.png"), size=(TILE_SIZE, TILE_SIZE)),
                 size=(WORLD_HEIGHT, WORLD_WIDTH))
         }
-
-        self.player = Player(Animation(load_images('entity/player')), (5, 5)),
+        self.now = 0
+        self.timer = Timer()
+        self.player = Player(self.assets["player/idle"], tilePosToPos((14, 8))),
         self.particles = [
 
         ]
@@ -50,7 +52,7 @@ class Game:
 
         ]
         self.tileObjects = [
-            TileMine((14,8), self.tilemaps['object'], 'resources/map/tilemine.csv')
+            TileMine((14,8), self.tilemaps['object'], 'resources/map/tilemine.csv', self)
         ]
         self.UIs = {
             # 'panel' : pygame_gui.elements.UIPanel(relative_rect = pygame.Rect(100,100,100,100), starting_height=1000, manager = self.ui),
@@ -73,20 +75,15 @@ class Game:
         dragging = False
         lastUpdated = 0
         timeCounter = 0
-
-        targetZoom = self.zoomFactor
-
+        dt = 0
 
         while True:
-            self.screen.fill((0, 0, 0, 0))
-            self.display.fill((0, 0, 0, 0))
-
-            now = time.time()
-            dt = now - prevTime
-            prevTime = now
+            self.now = time.time()
+            dt = self.now - prevTime
+            prevTime = self.now
             timeCounter += dt
-            # zoomedTileSize = TILE_SIZE * self.zoomFactor
 
+            self.timer.update()
             # Update logic here
 
             for event in pygame.event.get():
@@ -117,10 +114,7 @@ class Game:
                         pass
                 if event.type == pygame.KEYDOWN:
                     if event.key == pygame.K_q:
-                        for i in range(50):
-                            self.particles.append(
-                                Particle(self.player[0].center(), ((random.random() - 0.5) * 20, (random.random() - 0.5) * 20),
-                                         5.0, random.random()+0.01, (random.random()*255, random.random()*255, random.random()*255), 0, 0))
+                        self.tileObjects[0].spawnTileObject(self)
 
                         # targetZoom += 0.5
                     elif event.key == pygame.K_w:
@@ -140,58 +134,8 @@ class Game:
                 self.player[0].pos[1] += 1
 
 
-            for i in self.objects:
-                i.update()
-                i.render(self.display, self.viewport)
-            for i in self.tilemaps:
-                self.tilemaps[i].render(self.display,
-                                                self.viewport)
-            self.screen.blit(self.display, (0,0))
-            # zoomRect = pygame.Rect(SCREEN_WIDTH // 4, SCREEN_HEIGHT // 4, SCREEN_WIDTH // 2, SCREEN_HEIGHT // 2)
-            #
-            # # Capture the area you want to zoom
-            # capturedArea = self.screen.subsurface(zoomRect)
-            #
-            # # Scale the captured area based on the zoom factor
-            # zoomedArea = pygame.transform.scale(capturedArea, (
-            # int(zoomRect.width * self.zoomFactor), int(zoomRect.height * self.zoomFactor)))
-            #
-            # # Blit the zoomed area back to the screen at the desired position
-            # self.screen.blit(zoomedArea, (zoomRect.left, zoomRect.top))
-
-            self.zoomFactor = (1 - CAM_LERP_SPEED * dt) * self.zoomFactor + CAM_LERP_SPEED * dt * targetZoom
-            self.camPos = (1 - CAM_LERP_SPEED * dt) * self.camPos + CAM_LERP_SPEED * dt * self.player[0].pos
-
-            self.viewport.left = self.camPos[1] - (SCREEN_HEIGHT / self.zoomFactor) / 2 + TILE_SIZE/2
-            self.viewport.top = self.camPos[0] - (SCREEN_WIDTH / self.zoomFactor) / 2 + TILE_SIZE/2
-            # self.viewport.width = SCREEN_WIDTH / self.zoomFactor
-            # self.viewport.height = SCREEN_HEIGHT / self.zoomFactor
-
-            for i in self.objects:
-                i.update()
-                i.render(self.display, self.viewport)
-            for i in self.tilemaps:
-                self.tilemaps[i].render(self.display, self.viewport)
-            for i in self.particles:
-                if i.update():
-                    i.render(self.display, self.viewport, 1, 1)
-                else:
-                    self.particles.remove(i)
-
-            self.player[0].update()
-            self.player[0].render(self.display, self.viewport)
-
-            capturedContent = self.display.copy()
-
-            zoomedContent = pygame.transform.scale(capturedContent, (
-            int(SCREEN_WIDTH * self.zoomFactor), int(SCREEN_HEIGHT * self.zoomFactor)))
-            self.ui.update(dt)
-            self.ui.draw_ui(zoomedContent)
-
-            self.screen.blit(zoomedContent, (0, 0))
-            # self.screen.blit(self.display, (0,0))
-            pygame.display.update()
-            self.clock.tick(60)
+            self.renderer.render(self, dt)
+            self.now+=self.clock.tick(60)
 
 
 if __name__ == "__main__":

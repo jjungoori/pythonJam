@@ -4,7 +4,9 @@ import pygame
 import numpy as np
 from scripts.constants import *
 from scripts.utils import *
+from scripts.particle import *
 import csv
+
 
 
 class GameObject(pygame.sprite.Sprite):
@@ -27,8 +29,8 @@ class GameObject(pygame.sprite.Sprite):
         # scaledImageHeight = int(game_object.image.get_height() * zoomFactor)
         # scaledImage = pygame.transform.scale(game_object.image, (scaledImageWidth, scaledImageHeight))
 
-        objectScreenX = int(self.pos[0] - viewport.left)
-        objectScreenY = int(self.pos[1] - viewport.top)
+        objectScreenX = int(self.pos[0] - viewport.top)
+        objectScreenY = int(self.pos[1] - viewport.left)
         screen.blit(self.animation.img(), (objectScreenX, objectScreenY))
 
 class Player(GameObject):
@@ -45,7 +47,7 @@ class TileObject:
         self.csvStructure = csvStructure
         self.structure = np.zeros(size, dtype=int)
         self.loadStructureFromCsv()
-        self.on = False
+        self.on = True
 
 
     def loadStructureFromCsv(self):
@@ -57,6 +59,8 @@ class TileObject:
 
     def placeOnTilemap(self):
         # print(self.structure.shape[0], self.structure.shape[1])
+        if not self.on:
+            return
         for i in range(self.structure.shape[0]):
             for j in range(self.structure.shape[1]):
                 tileIndex = self.structure[i, j]
@@ -72,18 +76,33 @@ class TileObject:
 
 class TileMine(TileObject):
 
-    def __init__(self, pos, targetTilemap, csvStructure):
+    def __init__(self, pos, targetTilemap, csvStructure, game):
         super().__init__(pos, targetTilemap, csvStructure, (3,2))
-
         self.tileMatch = {
             1 : [[48, 70, 92], [115, 137, 159]],
             0 : [[114, 136, 158], [49, 71, 93]]
         }
-        self.tiles = np.array([[1,0],[1,0],[0,0]])
+        self.tiles = np.array([[1,0],[1,0],[1,0]])
+        self.on = False
+        self.readyObject = GameObject(Animation(load_images('entity/spawner'), loop=False, img_dur=8, start = False), tilePosToPos(self.pos))
+        self.readyObject.pos[1] -= 16
+        game.objects.append(self.readyObject)
         # self.sync()
 
-    def spawnTileObject(self, l):
-        l.append(GameObject(Animation(load_images('entity/spawner'), loop=True, img_dur=8), tilePosToPos((14,8))))
+    def spawnTileObject(self, game):
+        print(tilePosToPos(self.pos))
+        self.readyObject.animation.start = True
+        def temp():
+            game.objects.remove(self.readyObject)
+            for i in range(100):
+                game.particles.append(
+                    Particle(tilePosToPos(self.pos+np.array((1,0.5+3.5/100*i),int)), ((random.random() - 0.5) * 20, (random.random() - 0.5) * 20), 5.0,
+                             random.random() + 0.01,
+                             (random.random() * 255, random.random() * 255, random.random() * 255), 0, 0))
+            self.on = True
+            self.sync()
+        game.timer.add(self.readyObject.animation.img_duration*len(self.readyObject.animation.images)*10+2000, temp)
+
 
     def sync(self):
         print(self.tiles)
@@ -103,3 +122,8 @@ class TileMine(TileObject):
 
         self.sync()
 
+class Island:
+    def __init__(self):
+        self.tileMines = []
+        self.type = 'whiteLand'
+        self.level = 0
