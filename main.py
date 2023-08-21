@@ -20,6 +20,7 @@ class Game:
 
         self.renderer = Renderer()
 
+        self.font = pygame.font.Font('resources/stardust.ttf')
         self.ui = pygame_gui.UIManager((SCREEN_WIDTH,SCREEN_HEIGHT))
 
         self.zoomFactor = 3
@@ -33,7 +34,16 @@ class Game:
 
         self.assets = {
             'player/idle': Animation(load_images('entity/player'), img_dur=10),
+            'ui/leftBtn.png' : 0,
+            'ui/rightBtn.png' : 0
         }
+        for i in self.assets:
+            if self.assets[i] == 0:
+                self.assets[i] = load_image(i)
+            if i.startswith('ui/'):
+                self.assets[i].
+
+
         self.tilemaps = {
             'main': StaticTilemap(
                 Tileset(load_image("tileset/tileset.png"), size=(TILE_SIZE, TILE_SIZE)),
@@ -62,6 +72,7 @@ class Game:
 
         self.load()
         self.run()
+
 
     def load(self):
         self.tilemaps['main'].loadFromCsv('map/firstIsland.csv')
@@ -120,6 +131,7 @@ class Game:
                     elif event.key == pygame.K_w:
                         # self.UIs['textBox'].set_active_effect(pygame_gui.TEXT_EFFECT_BOUNCE, effect_tag='test')
                         self.tileObjects[0].mine()
+                        self.renderer.shake = 0.3
                         # targetZoom -= 0.5
                         pass
                 self.ui.process_events(event)

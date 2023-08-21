@@ -1,5 +1,8 @@
+import random
+
 import pygame
 from scripts.constants import *
+
 
 class Renderer:
 
@@ -9,10 +12,11 @@ class Renderer:
         self.targetZoom = 3
         self.screen = pygame.display.set_mode((SCREEN_WIDTH, SCREEN_HEIGHT))
         self.display = pygame.Surface((SCREEN_WIDTH, SCREEN_HEIGHT))
+        self.shake = 10
 
     def render(self, game, dt):
-        self.screen.fill((0, 0, 0, 0))
-        self.display.fill((0, 0, 0, 0))
+        # self.screen.fill((0, 0, 0, 0))
+        self.display.fill((201, 225, 229, 255))
 
         for i in game.objects:
             i.update()
@@ -38,9 +42,12 @@ class Renderer:
 
         game.viewport.left = game.camPos[1] - (SCREEN_HEIGHT / game.zoomFactor) / 2 + TILE_SIZE / 2
         game.viewport.top = game.camPos[0] - (SCREEN_WIDTH / game.zoomFactor) / 2 + TILE_SIZE / 2
+        if self.shake > 0.1:
+            game.viewport.top += self.shake * (0.5 - random.random())
+            game.viewport.left += self.shake * (0.5 - random.random())
+            self.shake *= 0.9
         # self.viewport.width = SCREEN_WIDTH / self.zoomFactor
         # self.viewport.height = SCREEN_HEIGHT / self.zoomFactor
-
 
         for i in game.tilemaps:
             game.tilemaps[i].render(self.display, game.viewport)
@@ -60,9 +67,14 @@ class Renderer:
 
         zoomedContent = pygame.transform.scale(capturedContent, (
             int(SCREEN_WIDTH * game.zoomFactor), int(SCREEN_HEIGHT * game.zoomFactor)))
-        game.ui.update(dt)
-        game.ui.draw_ui(zoomedContent)
+        # game.ui.update(dt)
+        # game.ui.draw_ui(zoomedContent)
+        # ------------------UI------------------
 
+        zoomedContent.blit(game.assets['ui/leftBtn.png'], (0,0+SCREEN_HEIGHT-100))
+        zoomedContent.blit(game.font.render("Elemental", True, (0,0,0)), (10,10))
+
+        #---------------------------------------
         self.screen.blit(zoomedContent, (0, 0))
         # self.screen.blit(self.display, (0,0))
         pygame.display.update()

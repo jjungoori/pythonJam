@@ -93,6 +93,7 @@ class TileMine(TileObject):
         print(tilePosToPos(self.pos))
         self.readyObject.animation.start = True
         def temp():
+            game.renderer.shake = 10
             game.objects.remove(self.readyObject)
             for i in range(100):
                 game.particles.append(
