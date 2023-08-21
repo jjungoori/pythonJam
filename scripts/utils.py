@@ -1,7 +1,7 @@
 import os
 import csv
 import pygame
-from scripts.constants import BASE_IMG_PATH, TILE_SIZE
+from scripts.constants import *
 
 
 def load_image(path):
@@ -18,6 +18,18 @@ def load_images(path):
 
 def tilePosToPos(pos):
     return (pos[0]*TILE_SIZE, pos[1]*TILE_SIZE)
+
+def center(img, pos = (0,0)):
+    return ((SCREEN_WIDTH - img.get_width())/2, (SCREEN_HEIGHT - img.get_height())/2)
+
+def colCenter(img, pos = (0,0)):
+    return ((SCREEN_WIDTH - img.get_width())/2, pos[1])
+
+def rowCenter(img, pos = (0,0)):
+    return (pos[0], (SCREEN_HEIGHT - img.get_height())/2)
+
+def bottom(img, pos):
+    return (pos[0], (SCREEN_HEIGHT-img.get_height()))
 
 class Animation:
     def __init__(self, images, img_dur=5, loop=True, start=True):
@@ -41,6 +53,7 @@ class Animation:
             if self.frame >= self.img_duration * len(self.images) - 1:
                 self.done = True
                 print("done")
+
 
     def img(self):
         return self.images[int(self.frame / self.img_duration)]

@@ -1,7 +1,9 @@
 import random
 
+import numpy as np
 import pygame
 from scripts.constants import *
+from scripts.utils import *
 
 
 class Renderer:
@@ -38,7 +40,7 @@ class Renderer:
         # self.screen.blit(zoomedArea, (zoomRect.left, zoomRect.top))
 
         game.zoomFactor = (1 - CAM_LERP_SPEED * dt) * game.zoomFactor + CAM_LERP_SPEED * dt * self.targetZoom
-        game.camPos = (1 - CAM_LERP_SPEED * dt) * game.camPos + CAM_LERP_SPEED * dt * game.player[0].pos
+        game.camPos = (1 - CAM_LERP_SPEED * dt) * game.camPos + CAM_LERP_SPEED * dt * (game.player[0].pos + np.array((0,5)))
 
         game.viewport.left = game.camPos[1] - (SCREEN_HEIGHT / game.zoomFactor) / 2 + TILE_SIZE / 2
         game.viewport.top = game.camPos[0] - (SCREEN_WIDTH / game.zoomFactor) / 2 + TILE_SIZE / 2
@@ -71,7 +73,16 @@ class Renderer:
         # game.ui.draw_ui(zoomedContent)
         # ------------------UI------------------
 
-        zoomedContent.blit(game.assets['ui/leftBtn.png'], (0,0+SCREEN_HEIGHT-100))
+        leftBtns = [game.assets['ui/leftBtn.png'], game.assets['ui/leftBtnPressed.png']]
+        rightBtns = [game.assets['ui/rightBtn.png'], game.assets['ui/rightBtnPressed.png']]
+
+        ti = leftBtns[game.eventHandler.left]
+        zoomedContent.blit(ti, colCenter(ti, bottom(ti, (0,0))) + np.array((-110,-20) ))
+        ti = rightBtns[game.eventHandler.right]
+        zoomedContent.blit(ti, colCenter(ti, bottom(ti, (0, 0))) + np.array((110,-20)))
+        ti = game.assets['ui/scrollMask.png']
+        zoomedContent.blit(ti, colCenter(ti, bottom(ti, (0,0))))
+
         zoomedContent.blit(game.font.render("Elemental", True, (0,0,0)), (10,10))
 
         #---------------------------------------

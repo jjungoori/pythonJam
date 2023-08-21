@@ -86,7 +86,9 @@ class TileMine(TileObject):
         self.on = False
         self.readyObject = GameObject(Animation(load_images('entity/spawner'), loop=False, img_dur=8, start = False), tilePosToPos(self.pos))
         self.readyObject.pos[1] -= 16
-        game.objects.append(self.readyObject)
+        self.game = game
+        self.game.objects.append(self.readyObject)
+        self.playerOffsetPos = ((-0.25,2), (1.25,2))
         # self.sync()
 
     def spawnTileObject(self, game):
@@ -111,7 +113,10 @@ class TileMine(TileObject):
             self.structure[i][0] = self.tileMatch[self.tiles[i][0]][0][i]
             self.structure[i][1] = self.tileMatch[self.tiles[i][1]][1][i]
         self.placeOnTilemap()
-    def mine(self):
+    def mine(self, lr):
+        print(tilePosToPos(self.pos + np.array(self.playerOffsetPos[lr])), self.game.player[0].pos)
+        self.game.player[0].pos = np.array(tilePosToPos(self.pos + np.array(self.playerOffsetPos[lr], dtype=float)))
+        getTiles = (self.tiles[2][0], self.tiles[2][1])
         self.tiles[2] = self.tiles[1]
         self.tiles[1] = self.tiles[0]
         l = random.randint(0,1)
@@ -122,6 +127,8 @@ class TileMine(TileObject):
         self.tiles[0] = np.array([l, r], dtype=int)
 
         self.sync()
+        self.game.renderer.shake = 0.3
+        return getTiles[lr], 1
 
 class Island:
     def __init__(self):

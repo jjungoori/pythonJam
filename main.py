@@ -12,6 +12,7 @@ from scripts.utils import *
 from scripts.particle import *
 from scripts.renderer import *
 from  scripts.timer import *
+from scripts.eventHandler import *
 
 
 
@@ -19,6 +20,7 @@ class Game:
     def __init__(self):
 
         self.renderer = Renderer()
+        self.eventHandler = EventHandler(self)
 
         self.font = pygame.font.Font('resources/stardust.ttf')
         self.ui = pygame_gui.UIManager((SCREEN_WIDTH,SCREEN_HEIGHT))
@@ -35,14 +37,17 @@ class Game:
         self.assets = {
             'player/idle': Animation(load_images('entity/player'), img_dur=10),
             'ui/leftBtn.png' : 0,
-            'ui/rightBtn.png' : 0
+            'ui/rightBtn.png' : 0,
+            'ui/scrollMask.png' : 0,
+            'ui/leftBtnPressed.png' : 0,
+            'ui/rightBtnPressed.png' : 0
         }
         for i in self.assets:
             if self.assets[i] == 0:
                 self.assets[i] = load_image(i)
             if i.startswith('ui/'):
-                self.assets[i].
-
+                self.assets[i] = pygame.transform.scale(self.assets[i],
+                                                     (self.assets[i].get_width() * 3, self.assets[i].get_height() * 3))
 
         self.tilemaps = {
             'main': StaticTilemap(
@@ -97,44 +102,7 @@ class Game:
             self.timer.update()
             # Update logic here
 
-            for event in pygame.event.get():
-                if event.type == pygame.QUIT:
-                    pygame.quit()
-                    sys.exit()
-                elif event.type == pygame.KEYDOWN:
-                    if event.key == pygame.K_LEFT:
-                        self.movement[0] = True
-                    elif event.key == pygame.K_RIGHT:
-                        self.movement[1] = True
-                    elif event.key == pygame.K_UP:
-                        self.movement[2] = True
-                        pass
-                    elif event.key == pygame.K_DOWN:
-                        self.movement[3] = True
-                        pass
-                elif event.type == pygame.KEYUP:
-                    if event.key == pygame.K_LEFT:
-                        self.movement[0] = False
-                    if event.key == pygame.K_RIGHT:
-                        self.movement[1] = False
-                    if event.key == pygame.K_UP:
-                        self.movement[2] = False
-                        pass
-                    if event.key == pygame.K_DOWN:
-                        self.movement[3] = False
-                        pass
-                if event.type == pygame.KEYDOWN:
-                    if event.key == pygame.K_q:
-                        self.tileObjects[0].spawnTileObject(self)
-
-                        # targetZoom += 0.5
-                    elif event.key == pygame.K_w:
-                        # self.UIs['textBox'].set_active_effect(pygame_gui.TEXT_EFFECT_BOUNCE, effect_tag='test')
-                        self.tileObjects[0].mine()
-                        self.renderer.shake = 0.3
-                        # targetZoom -= 0.5
-                        pass
-                self.ui.process_events(event)
+            self.eventHandler.update()
 
             if self.movement[0]:
                 self.player[0].pos[0] -= 1
