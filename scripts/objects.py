@@ -89,12 +89,15 @@ class TileMine(TileObject):
         self.game = game
         self.game.objects.append(self.readyObject)
         self.playerOffsetPos = ((-0.25,2), (1.25,2))
+        self.prvElement = -1
         # self.sync()
 
     def spawnTileObject(self, game):
+        game.soundAssets['mineSpawnStart'].play()
         print(tilePosToPos(self.pos))
         self.readyObject.animation.start = True
         def temp():
+            game.soundAssets['mineSpawn'].play()
             game.renderer.shake = 10
             game.objects.remove(self.readyObject)
             for i in range(100):
@@ -114,6 +117,7 @@ class TileMine(TileObject):
             self.structure[i][1] = self.tileMatch[self.tiles[i][1]][1][i]
         self.placeOnTilemap()
     def mine(self, lr):
+        self.game.soundAssets['mine'].play()
         print(tilePosToPos(self.pos + np.array(self.playerOffsetPos[lr])), self.game.player[0].pos)
         self.game.player[0].pos = np.array(tilePosToPos(self.pos + np.array(self.playerOffsetPos[lr], dtype=float)))
         getTiles = (self.tiles[2][0], self.tiles[2][1])
@@ -128,7 +132,8 @@ class TileMine(TileObject):
 
         self.sync()
         self.game.renderer.shake = 0.3
-        return getTiles[lr], 1
+        self.game.gameManager.mine(getTiles[lr])
+        return getTiles[lr]
 
 class Island:
     def __init__(self):

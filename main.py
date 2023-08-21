@@ -13,6 +13,7 @@ from scripts.particle import *
 from scripts.renderer import *
 from  scripts.timer import *
 from scripts.eventHandler import *
+from scripts.gameManager import *
 
 
 
@@ -21,8 +22,10 @@ class Game:
 
         self.renderer = Renderer()
         self.eventHandler = EventHandler(self)
+        self.gameManager = GameManager(self)
 
         self.font = pygame.font.Font('resources/stardust.ttf')
+        self.largeFont = pygame.font.Font('resources/stardust.ttf', 40)
         self.ui = pygame_gui.UIManager((SCREEN_WIDTH,SCREEN_HEIGHT))
 
         self.zoomFactor = 3
@@ -36,18 +39,36 @@ class Game:
 
         self.assets = {
             'player/idle': Animation(load_images('entity/player'), img_dur=10),
+            'ui/elements' : load_images('ui/elements'),
             'ui/leftBtn.png' : 0,
             'ui/rightBtn.png' : 0,
             'ui/scrollMask.png' : 0,
             'ui/leftBtnPressed.png' : 0,
-            'ui/rightBtnPressed.png' : 0
+            'ui/rightBtnPressed.png' : 0,
+            'ui/mine.png' : 0,
+            'ui/upgrade.png' : 0,
+            'ui/move.png' : 0
+        }
+        self.soundAssets = {
+            'mineSpawn' : pygame.mixer.Sound('resources/sound/mineSpawn.wav'),
+            'mine' : pygame.mixer.Sound('resources/sound/mine.wav'),
+            'mineSpawnStart' : pygame.mixer.Sound('resources/sound/mineSpawnStart.wav'),
+            'jump' : pygame.mixer.Sound('resources/sound/jump.wav')
         }
         for i in self.assets:
             if self.assets[i] == 0:
                 self.assets[i] = load_image(i)
             if i.startswith('ui/'):
-                self.assets[i] = pygame.transform.scale(self.assets[i],
-                                                     (self.assets[i].get_width() * 3, self.assets[i].get_height() * 3))
+                if i.endswith('.png'):
+                    self.assets[i] = pygame.transform.scale(self.assets[i],
+                                                            (self.assets[i].get_width() * 3,
+                                                             self.assets[i].get_height() * 3))
+                else:
+                    for l in range(len(self.assets[i])):
+                        self.assets[i][l] = pygame.transform.scale(self.assets[i][l],
+                                                                (self.assets[i][l].get_width() * 3,
+                                                                 self.assets[i][l].get_height() * 3))
+                        self.assets[i][l].set_alpha(70)
 
         self.tilemaps = {
             'main': StaticTilemap(
@@ -92,6 +113,10 @@ class Game:
         lastUpdated = 0
         timeCounter = 0
         dt = 0
+
+        pygame.mixer.music.load('resources/sound/bgm.mp3')
+        pygame.mixer.music.set_volume(0.5)
+        pygame.mixer.music.play(-1)
 
         while True:
             self.now = time.time()

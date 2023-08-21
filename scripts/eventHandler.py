@@ -54,10 +54,12 @@ class EventHandler:
                 self.up()
     def leftC(self):
         self.left = 1
-        print(self.game.tileObjects[0].mine(0)[0])
+        self.game.tileObjects[0].mine(0)
+        # print(self.game.tileObjects[0].mine(0)[0])
     def up(self):
         self.right, self.left = 0, 0
 
     def rightC(self):
         self.right = 1
-        print(self.game.tileObjects[0].mine(1)[0])
+        self.game.tileObjects[0].mine(1)
+        # print(self.game.tileObjects[0].mine(1)[0])

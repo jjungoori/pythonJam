@@ -65,27 +65,38 @@ class Renderer:
         game.player[0].update()
         game.player[0].render(self.display, game.viewport)
 
-        capturedContent = self.display.copy()
+        capturedScreen = self.display.copy()
 
-        zoomedContent = pygame.transform.scale(capturedContent, (
+        zoomedScreen = pygame.transform.scale(capturedScreen, (
             int(SCREEN_WIDTH * game.zoomFactor), int(SCREEN_HEIGHT * game.zoomFactor)))
         # game.ui.update(dt)
-        # game.ui.draw_ui(zoomedContent)
+        # game.ui.draw_ui(zoomedScreen)
         # ------------------UI------------------
 
         leftBtns = [game.assets['ui/leftBtn.png'], game.assets['ui/leftBtnPressed.png']]
         rightBtns = [game.assets['ui/rightBtn.png'], game.assets['ui/rightBtnPressed.png']]
 
+        dummy = game.assets['ui/leftBtn.png']
         ti = leftBtns[game.eventHandler.left]
-        zoomedContent.blit(ti, colCenter(ti, bottom(ti, (0,0))) + np.array((-110,-20) ))
+        zoomedScreen.blit(ti, colCenter(ti, bottom(ti, (0,0))) + np.array((-130,-20) ))
         ti = rightBtns[game.eventHandler.right]
-        zoomedContent.blit(ti, colCenter(ti, bottom(ti, (0, 0))) + np.array((110,-20)))
-        ti = game.assets['ui/scrollMask.png']
-        zoomedContent.blit(ti, colCenter(ti, bottom(ti, (0,0))))
+        zoomedScreen.blit(ti, colCenter(ti, bottom(ti, (0, 0))) + np.array((130,-20)))
+        ti = game.assets['ui/mine.png']
+        zoomedScreen.blit(ti, colCenter(ti, bottom(ti, (0,0))))
 
-        zoomedContent.blit(game.font.render("Elemental", True, (0,0,0)), (10,10))
+        # zoomedScreen.blit(game.font.render("Elemental", True, (0,0,0)), (10,10))
+
+        txt = game.largeFont.render(str(game.gameManager.combo), True, (83, 87, 92))
+        if game.gameManager.combo >= 1:
+            ti = game.assets['ui/elements'][game.gameManager.prvElement]
+            # print(ti)
+            zoomedScreen.blit(ti, colCenter(txt, (0, 40)) + np.array((-40, 0)))
+        zoomedScreen.blit(txt, colCenter(txt, (0,40)))
+
+        txt = game.font.render("Combo", True, (180, 180, 180))
+        zoomedScreen.blit(txt, colCenter(txt, (0, 80)))
 
         #---------------------------------------
-        self.screen.blit(zoomedContent, (0, 0))
+        self.screen.blit(zoomedScreen, (0, 0))
         # self.screen.blit(self.display, (0,0))
         pygame.display.update()
