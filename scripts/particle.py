@@ -57,3 +57,5 @@ class Particle:
         display.blit(glow_img(int(self.size * 1.5 + 2), (int(self.color[0] / 2), int(self.color[1] / 2), int(self.color[2] / 2))), (self.position[0] - self.size * 2 - viewport.top, self.position[1] + height - self.size * 2 - viewport.left), special_flags=BLEND_RGBA_ADD)
         display.blit(glow_img(int(self.size), self.color), (self.position[0] - self.size - viewport.top, self.position[1] + height - self.size - viewport.left), special_flags=BLEND_RGBA_ADD)
         display.set_at((int(self.position[0]) - viewport.top, int(self.position[1] + height)- viewport.left), (255, 255, 255))
+
+

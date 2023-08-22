@@ -53,7 +53,8 @@ class Game:
             'mineSpawn' : pygame.mixer.Sound('resources/sound/mineSpawn.wav'),
             'mine' : pygame.mixer.Sound('resources/sound/mine.wav'),
             'mineSpawnStart' : pygame.mixer.Sound('resources/sound/mineSpawnStart.wav'),
-            'jump' : pygame.mixer.Sound('resources/sound/jump.wav')
+            'jump' : pygame.mixer.Sound('resources/sound/jump.wav'),
+            'fail50' : pygame.mixer.Sound('resources/sound/fail50.wav')
         }
         for i in self.assets:
             if self.assets[i] == 0:
@@ -88,7 +89,8 @@ class Game:
 
         ]
         self.tileObjects = [
-            TileMine((14,8), self.tilemaps['object'], 'resources/map/tilemine.csv', self)
+            TileMine((1,8), self.tilemaps['object'], 'resources/map/tilemine.csv', self)
+            # Island((1,8), self.tilemaps['object'], 'resources/map/firstIsland.csv', (5,5), [])
         ]
         self.UIs = {
             # 'panel' : pygame_gui.elements.UIPanel(relative_rect = pygame.Rect(100,100,100,100), starting_height=1000, manager = self.ui),

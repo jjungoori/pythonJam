@@ -20,24 +20,13 @@ class Renderer:
         # self.screen.fill((0, 0, 0, 0))
         self.display.fill((201, 225, 229, 255))
 
-        for i in game.objects:
-            i.update()
-            i.render(self.display, game.viewport)
-        for i in game.tilemaps:
-            game.tilemaps[i].render(self.display,
-                                    game.viewport)
-        self.screen.blit(self.display, (0, 0))
-        # zoomRect = pygame.Rect(SCREEN_WIDTH // 4, SCREEN_HEIGHT // 4, SCREEN_WIDTH // 2, SCREEN_HEIGHT // 2)
-        #
-        # # Capture the area you want to zoom
-        # capturedArea = self.screen.subsurface(zoomRect)
-        #
-        # # Scale the captured area based on the zoom factor
-        # zoomedArea = pygame.transform.scale(capturedArea, (
-        # int(zoomRect.width * self.zoomFactor), int(zoomRect.height * self.zoomFactor)))
-        #
-        # # Blit the zoomed area back to the screen at the desired position
-        # self.screen.blit(zoomedArea, (zoomRect.left, zoomRect.top))
+        # for i in game.objects:
+        #     i.update()
+        #     i.render(self.display, game.viewport)
+        # for i in game.tilemaps:
+        #     game.tilemaps[i].render(self.display,
+        #                             game.viewport)
+        # self.screen.blit(self.display, (0, 0))
 
         game.zoomFactor = (1 - CAM_LERP_SPEED * dt) * game.zoomFactor + CAM_LERP_SPEED * dt * self.targetZoom
         game.camPos = (1 - CAM_LERP_SPEED * dt) * game.camPos + CAM_LERP_SPEED * dt * (game.player[0].pos + np.array((0,5)))
@@ -48,14 +37,13 @@ class Renderer:
             game.viewport.top += self.shake * (0.5 - random.random())
             game.viewport.left += self.shake * (0.5 - random.random())
             self.shake *= 0.9
-        # self.viewport.width = SCREEN_WIDTH / self.zoomFactor
-        # self.viewport.height = SCREEN_HEIGHT / self.zoomFactor
 
         for i in game.tilemaps:
             game.tilemaps[i].render(self.display, game.viewport)
         for i in game.objects:
             i.update()
             i.render(self.display, game.viewport)
+            # print(i)
         for i in game.particles:
             if i.update():
                 i.render(self.display, game.viewport, 1, 1)
@@ -69,8 +57,7 @@ class Renderer:
 
         zoomedScreen = pygame.transform.scale(capturedScreen, (
             int(SCREEN_WIDTH * game.zoomFactor), int(SCREEN_HEIGHT * game.zoomFactor)))
-        # game.ui.update(dt)
-        # game.ui.draw_ui(zoomedScreen)
+
         # ------------------UI------------------
 
         leftBtns = [game.assets['ui/leftBtn.png'], game.assets['ui/leftBtnPressed.png']]
@@ -89,14 +76,21 @@ class Renderer:
         txt = game.largeFont.render(str(game.gameManager.combo), True, (83, 87, 92))
         if game.gameManager.combo >= 1:
             ti = game.assets['ui/elements'][game.gameManager.prvElement]
-            # print(ti)
             zoomedScreen.blit(ti, colCenter(txt, (0, 40)) + np.array((-40, 0)))
         zoomedScreen.blit(txt, colCenter(txt, (0,40)))
 
         txt = game.font.render("Combo", True, (180, 180, 180))
         zoomedScreen.blit(txt, colCenter(txt, (0, 80)))
 
+        txt = game.font.render("2937", True, (200, 100, 100))
+        zoomedScreen.blit(txt, rowCenter(txt, (30, 0)) + np.array((0,-80)))
+        txt = game.font.render("2937", True, (100, 100, 200))
+        zoomedScreen.blit(txt, rowCenter(txt, (30, 0)) + np.array((0,-60)))
+        txt = game.font.render("2937", True, (150, 150, 200))
+        zoomedScreen.blit(txt, rowCenter(txt, (30, 0)) + np.array((0,-40)))
+        txt = game.font.render("2937", True, (150, 150, 100))
+        zoomedScreen.blit(txt, rowCenter(txt, (30, 0)) + np.array((0,-20)))
+
         #---------------------------------------
         self.screen.blit(zoomedScreen, (0, 0))
-        # self.screen.blit(self.display, (0,0))
         pygame.display.update()

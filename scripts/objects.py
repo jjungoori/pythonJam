@@ -1,5 +1,5 @@
 import random
-
+import json
 import pygame
 import numpy as np
 from scripts.constants import *
@@ -46,10 +46,13 @@ class TileObject:
         self.targetTilemap = targetTilemap
         self.csvStructure = csvStructure
         self.structure = np.zeros(size, dtype=int)
-        self.loadStructureFromCsv()
         self.on = True
 
+        self.run()
 
+
+    def run(self):
+        self.loadStructureFromCsv()
     def loadStructureFromCsv(self):
         with open(self.csvStructure, 'r') as file:
             reader = csv.reader(file)
@@ -76,14 +79,18 @@ class TileObject:
 
 class TileMine(TileObject):
 
-    def __init__(self, pos, targetTilemap, csvStructure, game):
+    def __init__(self, pos, targetTilemap, csvStructure, game, upgrades, elements):
         super().__init__(pos, targetTilemap, csvStructure, (3,2))
         self.tileMatch = {
             1 : [[48, 70, 92], [115, 137, 159]],
-            0 : [[114, 136, 158], [49, 71, 93]]
+            0 : [[114, 136, 158], [49, 71, 93]],
+            2 : [],
+            3 : []
         }
         self.tiles = np.array([[1,0],[1,0],[1,0]])
         self.on = False
+        self.upgrades = upgrades
+        self.elements = elements
         self.readyObject = GameObject(Animation(load_images('entity/spawner'), loop=False, img_dur=8, start = False), tilePosToPos(self.pos))
         self.readyObject.pos[1] -= 16
         self.game = game
@@ -94,11 +101,11 @@ class TileMine(TileObject):
 
     def spawnTileObject(self, game):
         game.soundAssets['mineSpawnStart'].play()
-        print(tilePosToPos(self.pos))
+        # print(tilePosToPos(self.pos))
         self.readyObject.animation.start = True
         def temp():
             game.soundAssets['mineSpawn'].play()
-            game.renderer.shake = 10
+            game.renderer.shake = 30
             game.objects.remove(self.readyObject)
             for i in range(100):
                 game.particles.append(
@@ -111,14 +118,14 @@ class TileMine(TileObject):
 
 
     def sync(self):
-        print(self.tiles)
+        # print(self.tiles)
         for i in range(3):
             self.structure[i][0] = self.tileMatch[self.tiles[i][0]][0][i]
             self.structure[i][1] = self.tileMatch[self.tiles[i][1]][1][i]
         self.placeOnTilemap()
     def mine(self, lr):
         self.game.soundAssets['mine'].play()
-        print(tilePosToPos(self.pos + np.array(self.playerOffsetPos[lr])), self.game.player[0].pos)
+        # print(tilePosToPos(self.pos + np.array(self.playerOffsetPos[lr])), self.game.player[0].pos)
         self.game.player[0].pos = np.array(tilePosToPos(self.pos + np.array(self.playerOffsetPos[lr], dtype=float)))
         getTiles = (self.tiles[2][0], self.tiles[2][1])
         self.tiles[2] = self.tiles[1]
@@ -131,12 +138,29 @@ class TileMine(TileObject):
         self.tiles[0] = np.array([l, r], dtype=int)
 
         self.sync()
-        self.game.renderer.shake = 0.3
+        if self.game.renderer.shake < 0.2:
+            self.game.renderer.shake = 0.2
         self.game.gameManager.mine(getTiles[lr])
         return getTiles[lr]
 
-class Island:
-    def __init__(self):
-        self.tileMines = []
+def islandLoader(jsonFile):
+    with open(jsonFile, 'r') as file:
+        data = json.load(file)
+        return Island(**data)
+
+class Island(TileObject):
+    def __init__(self, pos, csvStructure, targetTilemap, objs, level, type, start, end, upgrades, size):
+        super().__init__(pos, targetTilemap, csvStructure, size)
+        self.IslandObjects = []
         self.type = 'whiteLand'
         self.level = 0
+        self.start = ()
+        self.end = ()
+        self.objs = objs
+        self.run()
+
+    def run(self):
+        print("A")
+        self.placeOnTilemap()
+
+
