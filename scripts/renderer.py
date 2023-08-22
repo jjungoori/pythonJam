@@ -1,5 +1,5 @@
 import random
-
+import  pygame
 import numpy as np
 import pygame
 from scripts.constants import *
@@ -7,15 +7,26 @@ from scripts.utils import *
 
 
 class Renderer:
-
-    def __init__(self):
+    #tileObjects는 game 안에서 직접 로드. 프레임마다 재로드 불필요
+    def __init__(self, game):
         pygame.init()
         pygame.display.set_caption('Elemental Sky')
         self.targetZoom = 3
         self.screen = pygame.display.set_mode((SCREEN_WIDTH, SCREEN_HEIGHT))
         self.display = pygame.Surface((SCREEN_WIDTH, SCREEN_HEIGHT))
         self.shake = 10
+        self.game = game
 
+        self.interactiveUIs = {}
+        self.actionImages = []
+    def run(self):
+        ti = self.game.assets['ui/mine.png']
+        self.interactiveUIs['actionButton'] = (ImageButton(ti, colCenter(ti, bottom(ti, (0,0))), self.game.gameManager.changeAct))
+        self.actionImages = [
+            self.game.assets['ui/mine.png'],
+            self.game.assets['ui/move.png'],
+            self.game.assets['ui/upgrade.png'],
+        ]
     def render(self, game, dt):
         # self.screen.fill((0, 0, 0, 0))
         self.display.fill((201, 225, 229, 255))
@@ -68,8 +79,9 @@ class Renderer:
         zoomedScreen.blit(ti, colCenter(ti, bottom(ti, (0,0))) + np.array((-130,-20) ))
         ti = rightBtns[game.eventHandler.right]
         zoomedScreen.blit(ti, colCenter(ti, bottom(ti, (0, 0))) + np.array((130,-20)))
-        ti = game.assets['ui/mine.png']
-        zoomedScreen.blit(ti, colCenter(ti, bottom(ti, (0,0))))
+        self.interactiveUIs['actionButton'].image = self.actionImages[self.game.gameManager.action]
+        ti = self.interactiveUIs['actionButton']
+        zoomedScreen.blit(ti.image, ti.start)
 
         # zoomedScreen.blit(game.font.render("Elemental", True, (0,0,0)), (10,10))
 
@@ -82,15 +94,40 @@ class Renderer:
         txt = game.font.render("Combo", True, (180, 180, 180))
         zoomedScreen.blit(txt, colCenter(txt, (0, 80)))
 
-        txt = game.font.render("2937", True, (200, 100, 100))
-        zoomedScreen.blit(txt, rowCenter(txt, (30, 0)) + np.array((0,-80)))
-        txt = game.font.render("2937", True, (100, 100, 200))
-        zoomedScreen.blit(txt, rowCenter(txt, (30, 0)) + np.array((0,-60)))
-        txt = game.font.render("2937", True, (150, 150, 200))
-        zoomedScreen.blit(txt, rowCenter(txt, (30, 0)) + np.array((0,-40)))
-        txt = game.font.render("2937", True, (150, 150, 100))
-        zoomedScreen.blit(txt, rowCenter(txt, (30, 0)) + np.array((0,-20)))
+        txt = game.font.render(str(game.gameManager.fire), True, (200, 100, 100))
+        zoomedScreen.blit(txt,  np.array((20,20)))
+        txt = game.font.render(str(game.gameManager.water), True, (100, 100, 200))
+        zoomedScreen.blit(txt, np.array((20,40)))
+        txt = game.font.render(str(game.gameManager.air), True, (150, 150, 200))
+        zoomedScreen.blit(txt, np.array((20,60)))
+        txt = game.font.render(str(game.gameManager.lightening), True, (150, 150, 100))
+        zoomedScreen.blit(txt, np.array((20,80)))
 
         #---------------------------------------
         self.screen.blit(zoomedScreen, (0, 0))
         pygame.display.update()
+
+
+    def uiEvent(self):
+
+        rt = False
+
+        for i in self.interactiveUIs:
+            if self.interactiveUIs[i].update():
+                rt = True
+
+        return rt
+
+class ImageButton:
+    def __init__(self, image, pos, func):
+        self.image = image
+        self.start = pos
+        self.end = pos + np.array((image.get_width(), image.get_height()))
+        self.func = func
+
+    def update(self):
+        mp = pygame.mouse.get_pos()
+        if mp[0] < self.end[0] and mp[0] > self.start[0] and mp[1] < self.end[1] and mp[1] > self.start[1]:
+            self.func()
+            return True
+        return  False

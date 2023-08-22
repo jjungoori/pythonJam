@@ -40,25 +40,37 @@ class Player(GameObject):
         screen.blit(self.animation.img(), self.pos - (viewport.top, viewport.left))
 
 
+import csv
+import numpy as np
+
 class TileObject:
-    def __init__(self, pos, targetTilemap, csvStructure, size):
+    def __init__(self, pos, targetTilemap, csvStructure):
         self.pos = pos
         self.targetTilemap = targetTilemap
         self.csvStructure = csvStructure
-        self.structure = np.zeros(size, dtype=int)
+        self.structure = None
         self.on = True
 
         self.run()
 
-
     def run(self):
         self.loadStructureFromCsv()
+
     def loadStructureFromCsv(self):
+        rows = []
         with open(self.csvStructure, 'r') as file:
             reader = csv.reader(file)
-            for i, row in enumerate(reader):
-                for j, tileIndex in enumerate(row):
-                    self.structure[i, j] = int(tileIndex)
+            for row in reader:
+                rows.append([int(tileIndex) for tileIndex in row])
+
+        numRows = len(rows)
+        numCols = len(rows[0]) if numRows > 0 else 0
+        self.structure = np.zeros((numRows, numCols), dtype=int)
+
+        for i in range(numRows):
+            for j in range(numCols):
+                self.structure[i, j] = rows[i][j]
+
 
     def placeOnTilemap(self):
         # print(self.structure.shape[0], self.structure.shape[1])
@@ -77,10 +89,17 @@ class TileObject:
         else:
             print("Coordinates are out of bounds")
 
+
+def getTileMine(jsonFile, pos, game):
+    with open(jsonFile, 'r') as file:
+        data = json.load(file)
+        return TileMine(**data, targetTilemap=game.tilemaps['object'], game = game, pos = pos)
+
 class TileMine(TileObject):
 
     def __init__(self, pos, targetTilemap, csvStructure, game, upgrades, elements):
-        super().__init__(pos, targetTilemap, csvStructure, (3,2))
+        print("tilemineSpwan")
+        super().__init__(pos, targetTilemap, csvStructure)
         self.tileMatch = {
             1 : [[48, 70, 92], [115, 137, 159]],
             0 : [[114, 136, 158], [49, 71, 93]],
@@ -91,12 +110,13 @@ class TileMine(TileObject):
         self.on = False
         self.upgrades = upgrades
         self.elements = elements
-        self.readyObject = GameObject(Animation(load_images('entity/spawner'), loop=False, img_dur=8, start = False), tilePosToPos(self.pos))
+        self.readyObject = GameObject(Animation(load_images('entity/spawner'), loop=False, img_dur=4, start = False), tilePosToPos(self.pos))
         self.readyObject.pos[1] -= 16
         self.game = game
         self.game.objects.append(self.readyObject)
         self.playerOffsetPos = ((-0.25,2), (1.25,2))
         self.prvElement = -1
+        print("tilemineSpawned")
         # self.sync()
 
     def spawnTileObject(self, game):
@@ -143,24 +163,39 @@ class TileMine(TileObject):
         self.game.gameManager.mine(getTiles[lr])
         return getTiles[lr]
 
-def islandLoader(jsonFile):
+def getIsland(jsonFile, game):
     with open(jsonFile, 'r') as file:
         data = json.load(file)
-        return Island(**data)
+        print('json imported')
+        return Island(**data, targetTilemap=game.tilemaps['main'], game=game)
 
 class Island(TileObject):
-    def __init__(self, pos, csvStructure, targetTilemap, objs, level, type, start, end, upgrades, size):
-        super().__init__(pos, targetTilemap, csvStructure, size)
-        self.IslandObjects = []
+    def __init__(self, pos, csvStructure, targetTilemap, objs, level, type, start, end, upgrades, game):
+        self.objects = objs
+        self.game = game
+
+        super().__init__(pos, targetTilemap, csvStructure)
         self.type = 'whiteLand'
         self.level = 0
         self.start = ()
         self.end = ()
-        self.objs = objs
-        self.run()
+        self.currentObject = 0
 
     def run(self):
-        print("A")
-        self.placeOnTilemap()
+        # print("B")
+        self.objects = getObjectsFromDict(self.objects, self.game, self.pos)
+        # self.loadStructureFromCsv()
+        # self.placeOnTilemap()
 
 
+def getObjectsFromDict(objsDict, game, pos):
+    objs = []
+    for i in objsDict:
+        # print(i)
+        if i == "tilemines":
+            for l in objsDict[i]:
+                # print(l)
+                temp = getTileMine(l[0], pos + np.array(l[1]), game=game)
+                objs.append(temp)
+    print(objs)
+    return objs

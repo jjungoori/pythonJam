@@ -14,7 +14,18 @@ class EventHandler:
             if event.type == pygame.QUIT:
                 pygame.quit()
                 sys.exit()
+            elif event.type == pygame.MOUSEBUTTONDOWN:
+                if self.game.renderer.uiEvent():
+                    continue
+                if pygame.mouse.get_pos()[0] <= SCREEN_WIDTH/2:
+                    self.leftC()
+                else:
+                    self.rightC()
+            elif event.type == pygame.MOUSEBUTTONUP:
+                self.up()
             elif event.type == pygame.KEYDOWN:
+                if event.key == pygame.K_SPACE:
+                    self.game.gameManager.changeAct()
                 if event.key == pygame.K_LEFT:
                     # self.game.movement[0] = True
                     self.leftC()
@@ -39,19 +50,13 @@ class EventHandler:
                     self.game.movement[3] = False
                     pass
                 if event.key == pygame.K_q:
-                    self.game.tileObjects[0].spawnTileObject(self.game)
+                    pass
+                    # self.game.currentIsland.objects[0].spawnTileObject(self.game)
 
                     # targetZoom += 0.5
                 elif event.key == pygame.K_w:
                     pass
 
-            elif event.type == pygame.MOUSEBUTTONDOWN:
-                if pygame.mouse.get_pos()[0] <= SCREEN_WIDTH/2:
-                    self.leftC()
-                else:
-                    self.rightC()
-            elif event.type == pygame.MOUSEBUTTONUP:
-                self.up()
     def leftC(self):
         self.left = 1
         self.game.gameManager.act(0)

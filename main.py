@@ -19,8 +19,8 @@ from scripts.gameManager import *
 
 class Game:
     def __init__(self):
-
-        self.renderer = Renderer()
+        self.start = False
+        self.renderer = Renderer(self)
         self.eventHandler = EventHandler(self)
         self.gameManager = GameManager(self)
 
@@ -54,7 +54,9 @@ class Game:
             'mine' : pygame.mixer.Sound('resources/sound/mine.wav'),
             'mineSpawnStart' : pygame.mixer.Sound('resources/sound/mineSpawnStart.wav'),
             'jump' : pygame.mixer.Sound('resources/sound/jump.wav'),
-            'fail50' : pygame.mixer.Sound('resources/sound/fail50.wav')
+            'fail50' : pygame.mixer.Sound('resources/sound/fail50.wav'),
+            'fail200' : pygame.mixer.Sound('resources/sound/fail200.wav'),
+            'change' : pygame.mixer.Sound('resources/sound/change.wav')
         }
         for i in self.assets:
             if self.assets[i] == 0:
@@ -89,27 +91,40 @@ class Game:
 
         ]
         self.tileObjects = [
-            TileMine((1,8), self.tilemaps['object'], 'resources/map/tilemine.csv', self)
+            # getIsland('resources/map/basicIsland.json', self)
+            # getTileMine('resources/map/basicTileMine.json', targetTilemap=self.tilemaps['object'], game=self)
             # Island((1,8), self.tilemaps['object'], 'resources/map/firstIsland.csv', (5,5), [])
         ]
+        self.islands = [
+            getIsland('resources/map/basicIsland.json', self)
+        ]
+        self.currentIsland = self.islands[0]
         self.UIs = {
             # 'panel' : pygame_gui.elements.UIPanel(relative_rect = pygame.Rect(100,100,100,100), starting_height=1000, manager = self.ui),
             'button' : pygame_gui.elements.UIButton(relative_rect= (0,0), text = "hello", manager = self.ui),
             'textBox' : pygame_gui.elements.UITextBox(relative_rect=pygame.Rect(100,100,100,50), html_text="hello", manager=self.ui),
         }
 
+        self.renderer.run()
         self.load()
         self.run()
 
 
     def load(self):
-        self.tilemaps['main'].loadFromCsv('map/firstIsland.csv')
+        # self.tilemaps['main'].loadFromCsv('map/firstIsland.csv')
 
         for i in self.tileObjects:
             i.loadStructureFromCsv()
             i.placeOnTilemap()
 
+        for i in self.islands:
+            i.loadStructureFromCsv()
+            i.placeOnTilemap()
+            for l in i.objects:
+                l.placeOnTilemap()
+
     def run(self):
+        self.start = True
         prevTime = time.time()
         dragging = False
         lastUpdated = 0

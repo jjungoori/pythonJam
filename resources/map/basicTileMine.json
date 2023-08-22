@@ -1,0 +1,7 @@
+{
+  "csvStructure" : "resources/map/tilemine.csv",
+  "upgrades" : {
+    "add" : 1
+  },
+  "elements" : [0, 1]
+}

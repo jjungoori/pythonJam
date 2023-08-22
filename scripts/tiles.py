@@ -45,13 +45,13 @@ class StaticTilemap:
                 for j, tileIndex in enumerate(row):
                     self.map[i, j] = int(tileIndex)
 
-    def render(self, screen, viewport, chunkSize=(20, 20), ):
+    def render(self, screen, viewport, chunkSize=(50, 50), ):
 
 
         startChunkX = viewport.left // (chunkSize[0] * TILE_SIZE )
-        endChunkX = (viewport.right // (chunkSize[0] * TILE_SIZE )) + 1
+        endChunkX = ((viewport.right + 50) // (chunkSize[0] * TILE_SIZE )) + 1
         startChunkY = viewport.top // (chunkSize[1] * TILE_SIZE )
-        endChunkY = (viewport.bottom // (chunkSize[1] * TILE_SIZE )) + 1
+        endChunkY = ((viewport.bottom + 50)// (chunkSize[1] * TILE_SIZE )) + 1
 
         for chunkX in range(startChunkX, endChunkX):
             for chunkY in range(startChunkY, endChunkY):
