@@ -50,6 +50,7 @@ class TileObject:
         self.csvStructure = csvStructure
         self.structure = None
         self.on = True
+        self.working = False
 
         self.run()
 

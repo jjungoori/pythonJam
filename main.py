@@ -20,44 +20,24 @@ from scripts.gameManager import *
 class Game:
     def __init__(self):
         self.start = False
+
         self.renderer = Renderer(self)
         self.eventHandler = EventHandler(self)
-        self.gameManager = GameManager(self)
-
-        self.font = pygame.font.Font('resources/stardust.ttf')
-        self.largeFont = pygame.font.Font('resources/stardust.ttf', 40)
-        self.ui = pygame_gui.UIManager((SCREEN_WIDTH,SCREEN_HEIGHT))
-
-        self.zoomFactor = 3
-        self.player_speed = 1
-
-        self.viewport = pygame.Rect(0, 0, SCREEN_WIDTH, SCREEN_HEIGHT)  # Define viewport here
-        self.camPos = np.array((0,0), dtype=float)
-
-        self.clock = pygame.time.Clock()
-        self.movement = [False, False, False, False]
 
         self.assets = {
             'player/idle': Animation(load_images('entity/player'), img_dur=10),
-            'ui/elements' : load_images('ui/elements'),
-            'ui/leftBtn.png' : 0,
-            'ui/rightBtn.png' : 0,
-            'ui/scrollMask.png' : 0,
-            'ui/leftBtnPressed.png' : 0,
-            'ui/rightBtnPressed.png' : 0,
-            'ui/mine.png' : 0,
-            'ui/upgrade.png' : 0,
-            'ui/move.png' : 0
+            'ui/elements': load_images('ui/elements'),
+            'ui/leftBtn.png': 0,
+            'ui/rightBtn.png': 0,
+            'ui/scrollMask.png': 0,
+            'ui/leftBtnPressed.png': 0,
+            'ui/rightBtnPressed.png': 0,
+            'ui/mine.png': 0,
+            'ui/upgrade.png': 0,
+            'ui/move.png': 0,
+            # 'ui/upgradeAdd' : 1
         }
-        self.soundAssets = {
-            'mineSpawn' : pygame.mixer.Sound('resources/sound/mineSpawn.wav'),
-            'mine' : pygame.mixer.Sound('resources/sound/mine.wav'),
-            'mineSpawnStart' : pygame.mixer.Sound('resources/sound/mineSpawnStart.wav'),
-            'jump' : pygame.mixer.Sound('resources/sound/jump.wav'),
-            'fail50' : pygame.mixer.Sound('resources/sound/fail50.wav'),
-            'fail200' : pygame.mixer.Sound('resources/sound/fail200.wav'),
-            'change' : pygame.mixer.Sound('resources/sound/change.wav')
-        }
+
         for i in self.assets:
             if self.assets[i] == 0:
                 self.assets[i] = load_image(i)
@@ -72,6 +52,35 @@ class Game:
                                                                 (self.assets[i][l].get_width() * 3,
                                                                  self.assets[i][l].get_height() * 3))
                         self.assets[i][l].set_alpha(70)
+
+
+        self.gameManager = GameManager(self)
+
+        self.font = pygame.font.Font('resources/stardust.ttf')
+        self.largeFont = pygame.font.Font('resources/stardust.ttf', 40)
+        self.middleFont = pygame.font.Font('resources/stardust.ttf', 25)
+
+        self.ui = pygame_gui.UIManager((SCREEN_WIDTH,SCREEN_HEIGHT))
+
+        self.zoomFactor = 3
+        self.player_speed = 1
+
+        self.viewport = pygame.Rect(0, 0, SCREEN_WIDTH, SCREEN_HEIGHT)  # Define viewport here
+        self.camPos = np.array((0,0), dtype=float)
+
+        self.clock = pygame.time.Clock()
+        self.movement = [False, False, False, False]
+
+
+        self.soundAssets = {
+            'mineSpawn' : pygame.mixer.Sound('resources/sound/mineSpawn.wav'),
+            'mine' : pygame.mixer.Sound('resources/sound/mine.wav'),
+            'mineSpawnStart' : pygame.mixer.Sound('resources/sound/mineSpawnStart.wav'),
+            'jump' : pygame.mixer.Sound('resources/sound/jump.wav'),
+            'fail50' : pygame.mixer.Sound('resources/sound/fail50.wav'),
+            'fail200' : pygame.mixer.Sound('resources/sound/fail200.wav'),
+            'change' : pygame.mixer.Sound('resources/sound/change.wav')
+        }
 
         self.tilemaps = {
             'main': StaticTilemap(

@@ -2,12 +2,13 @@ import  pygame
 from scripts.objects import *
 import  numpy as np
 from scripts.utils import *
-
+from scripts.renderer import ImageButton
 class GameManager:
 
     def __init__(self, game):
         self.game = game
 
+        self.menu = Menu(self.game)
         #for mines
         self.combo = 0
         self.prvElement = -1
@@ -26,7 +27,9 @@ class GameManager:
             targetObject = self.game.currentIsland.objects[self.game.currentIsland.currentObject]
             if type(targetObject) == TileMine:
                 if not targetObject.on:
-                    targetObject.spawnTileObject(self.game)
+                    if not targetObject.working:
+                        targetObject.working = True
+                        targetObject.spawnTileObject(self.game)
                 else:
                     targetObject.mine(args[0])
         elif self.action == 1:
@@ -44,7 +47,6 @@ class GameManager:
                     targetObject = self.game.currentIsland.objects[self.game.currentIsland.currentObject]
                     self.game.player[0].pos = np.array(
                         tilePosToPos(targetObject.pos + np.array(targetObject.playerOffsetPos[1], dtype=float)))
-
             elif args[0] == 1:
                 if self.game.currentIsland.currentObject < len(self.game.currentIsland.objects)-1:
                     self.game.currentIsland.currentObject += 1
@@ -58,6 +60,8 @@ class GameManager:
                     targetObject = self.game.currentIsland.objects[self.game.currentIsland.currentObject]
                     self.game.player[0].pos = np.array(
                         tilePosToPos(targetObject.pos + np.array(targetObject.playerOffsetPos[1], dtype=float)))
+        elif self.action == 2:
+            self.menu.on = args[0] == 1
 
     def mine(self, element):
         if self.prvElement == element:
@@ -91,3 +95,23 @@ class GameManager:
         self.action += 1
         if self.action > 2:
             self.action = 0
+
+
+class MenuItems:
+    def __init__(self, image, button, title, description):
+        self.image = image
+        self.button = button
+        self.title = title
+        self.description = description
+class Menu:
+    def __init__(self, game):
+        self.on = False
+        self.game = game
+        self.items = [
+            MenuItems(None, ImageButton(image=game.assets['ui/leftBtn.png'], pos=(0,0), func=self.upgradeAdd), 'Add', 'add 1 combo per click'),
+            # MenuItems(None, None, 'Add', 'add 2 combo per click'),
+            # MenuItems(None, None, 'Add', 'add 3 combo per click')
+        ]
+
+    def upgradeAdd(self):
+        self.game.currentIsland.upgrades['add'] += 1

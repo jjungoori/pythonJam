@@ -18,6 +18,7 @@ class Renderer:
         self.game = game
 
         self.interactiveUIs = {}
+
         self.actionImages = []
     def run(self):
         ti = self.game.assets['ui/mine.png']
@@ -103,6 +104,32 @@ class Renderer:
         txt = game.font.render(str(game.gameManager.lightening), True, (160, 160, 100))
         zoomedScreen.blit(txt, np.array((20,80)))
 
+        if self.game.gameManager.menu.on:
+            menu = self.game.gameManager.menu
+            ti = game.assets['ui/leftBtn.png']
+            bgPos = center(ti, (0,0))
+            zoomedScreen.blit(ti, bgPos)
+
+            for i in range(len(menu.items)):
+                menuItem = menu.items[i]
+                if menuItem.image:
+                    ti = menuItem.image
+                    zoomedScreen.blit(ti, bgPos + np.array((20,20 + 80*i)))
+                txt = game.middleFont.render(menuItem.title, True, (0, 0, 0))
+                zoomedScreen.blit(txt, bgPos + np.array((40,20 + 80*i)))
+
+                txt = game.font.render(menuItem.description, True, (0, 0, 0))
+                zoomedScreen.blit(txt, bgPos + np.array((40,50 + 80*i)))
+
+                btnPos = bgPos + np.array((40, 50+txt.get_height() + 80*i))
+                menuItem.button.pos = np.array(btnPos)
+                menuItem.button.fixColl()
+                zoomedScreen.blit(menuItem.button.image, bgPos + np.array((40, 50+txt.get_height() + 80*i)))
+
+
+                txt = game.font.render('+', True, (200, 0, 0))
+                zoomedScreen.blit(txt, (192, 372))
+
         #---------------------------------------
         self.screen.blit(zoomedScreen, (0, 0))
         pygame.display.update()
@@ -116,6 +143,13 @@ class Renderer:
             if self.interactiveUIs[i].update():
                 rt = True
 
+        for i in self.game.gameManager.menu.items:
+            print("this ca")
+            if i.button.update():
+                print(';;')
+                rt = True
+        # if
+
         return rt
 
 class ImageButton:
@@ -125,9 +159,13 @@ class ImageButton:
         self.end = pos + np.array((image.get_width(), image.get_height()))
         self.func = func
 
+    def fixColl(self):
+        self.start = self.pos
+        self.end = self.pos + np.array((self.image.get_width(), self.image.get_height()))
     def update(self):
         mp = pygame.mouse.get_pos()
         if mp[0] < self.end[0] and mp[0] > self.start[0] and mp[1] < self.end[1] and mp[1] > self.start[1]:
             self.func()
             return True
+
         return  False
