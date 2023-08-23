@@ -5,13 +5,13 @@ class Timer:
         self.timers = []
 
     def add(self, delay, callback):
-        execute_at = pygame.time.get_ticks() + delay
-        self.timers.append((execute_at, callback))
+        targetTime = pygame.time.get_ticks() + delay
+        self.timers.append((targetTime, callback))
 
     def update(self):
-        current_time = pygame.time.get_ticks()
+        currentTime = pygame.time.get_ticks()
         for timer in self.timers.copy():
-            execute_at, callback = timer
-            if current_time >= execute_at:
+            targetTime, callback = timer
+            if currentTime >= targetTime:
                 callback()
                 self.timers.remove(timer)

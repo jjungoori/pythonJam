@@ -106,19 +106,20 @@ class Renderer:
 
         if self.game.gameManager.menu.on:
             menu = self.game.gameManager.menu
-            ti = game.assets['ui/leftBtn.png']
-            bgPos = center(ti, (0,0))
+            ti = game.assets['ui/UIBG.png']
+            bgPos = center(ti, (0,0)) -np.array((0,50))
             zoomedScreen.blit(ti, bgPos)
+            bgPos += np.array((0, 20))
 
             for i in range(len(menu.items)):
                 menuItem = menu.items[i]
                 if menuItem.image:
                     ti = menuItem.image
                     zoomedScreen.blit(ti, bgPos + np.array((20,20 + 80*i)))
-                txt = game.middleFont.render(menuItem.title, True, (0, 0, 0))
+                txt = game.middleFont.render(menuItem.title, True, (220, 220, 220))
                 zoomedScreen.blit(txt, bgPos + np.array((40,20 + 80*i)))
 
-                txt = game.font.render(menuItem.description, True, (0, 0, 0))
+                txt = game.font.render(menuItem.description, True, (150, 150, 150))
                 zoomedScreen.blit(txt, bgPos + np.array((40,50 + 80*i)))
 
                 btnPos = bgPos + np.array((40, 50+txt.get_height() + 80*i))

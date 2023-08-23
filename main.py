@@ -35,6 +35,7 @@ class Game:
             'ui/mine.png': 0,
             'ui/upgrade.png': 0,
             'ui/move.png': 0,
+            'ui/UIBG.png' : 0
             # 'ui/upgradeAdd' : 1
         }
 
