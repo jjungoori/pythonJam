@@ -45,13 +45,12 @@ class StaticTilemap:
                 for j, tileIndex in enumerate(row):
                     self.map[i, j] = int(tileIndex)
 
-    def render(self, screen, viewport, chunkSize=(50, 50), ):
+    def render(self, screen, viewport, chunkSize=(10, 10), distance=3):
 
-
-        startChunkX = viewport.left // (chunkSize[0] * TILE_SIZE )
-        endChunkX = ((viewport.right + 50) // (chunkSize[0] * TILE_SIZE )) + 1
-        startChunkY = viewport.top // (chunkSize[1] * TILE_SIZE )
-        endChunkY = ((viewport.bottom + 50)// (chunkSize[1] * TILE_SIZE )) + 1
+        startChunkX = viewport.left // (chunkSize[0] * TILE_SIZE) - distance
+        endChunkX = ((viewport.left + SCREEN_WIDTH) // (chunkSize[0] * TILE_SIZE)) + 1 + distance
+        startChunkY = viewport.top // (chunkSize[1] * TILE_SIZE) - distance
+        endChunkY = ((viewport.top + SCREEN_HEIGHT) // (chunkSize[1] * TILE_SIZE)) + 1 + distance
 
         for chunkX in range(startChunkX, endChunkX):
             for chunkY in range(startChunkY, endChunkY):
@@ -66,8 +65,7 @@ class StaticTilemap:
                             continue
 
                         tile = self.tileset.tiles[self.map[i, j]]
-                        screen.blit(tile, (
-                        (j * TILE_SIZE ) - viewport.top, (i * TILE_SIZE ) - viewport.left) )
+                        screen.blit(tile, ((j * TILE_SIZE) - viewport.top, (i * TILE_SIZE) - viewport.left))
 
     def set_random(self):
         n = len(self.tileset.tiles)

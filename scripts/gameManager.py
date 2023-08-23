@@ -1,4 +1,5 @@
 import  pygame
+from scripts.objects import *
 import  numpy as np
 from scripts.utils import *
 
@@ -23,26 +24,46 @@ class GameManager:
 
         if self.action == 0:
             targetObject = self.game.currentIsland.objects[self.game.currentIsland.currentObject]
-            if not targetObject.on:
-                targetObject.spawnTileObject(self.game)
-            else:
-                targetObject.mine(args[0])
+            if type(targetObject) == TileMine:
+                if not targetObject.on:
+                    targetObject.spawnTileObject(self.game)
+                else:
+                    targetObject.mine(args[0])
         elif self.action == 1:
-            if args[0] == 0 and self.game.currentIsland.currentObject > 0:
-                self.game.currentIsland.currentObject -= 1
-                targetObject = self.game.currentIsland.objects[self.game.currentIsland.currentObject]
-                self.game.player[0].pos = np.array(
-                    tilePosToPos(targetObject.pos + np.array(targetObject.playerOffsetPos[1], dtype=float)))
+            if args[0] == 0:
+                if self.game.currentIsland.currentObject > 0:
 
-            elif args[0] == 1 and self.game.currentIsland.currentObject < len(self.game.currentIsland.objects)-1:
-                self.game.currentIsland.currentObject += 1
-                targetObject = self.game.currentIsland.objects[self.game.currentIsland.currentObject]
-                self.game.player[0].pos = np.array(
-                    tilePosToPos(targetObject.pos + np.array(targetObject.playerOffsetPos[0], dtype=float)))
+                    self.game.currentIsland.currentObject -= 1
+                    targetObject = self.game.currentIsland.objects[self.game.currentIsland.currentObject]
+                    self.game.player[0].pos = np.array(
+                        tilePosToPos(targetObject.pos + np.array(targetObject.playerOffsetPos[1], dtype=float)))
+                elif self.game.currentIslandIndex > 0:
+                    self.game.currentIslandIndex -= 1
+                    self.game.currentIsland = self.game.islands[self.game.currentIslandIndex]
+
+                    targetObject = self.game.currentIsland.objects[self.game.currentIsland.currentObject]
+                    self.game.player[0].pos = np.array(
+                        tilePosToPos(targetObject.pos + np.array(targetObject.playerOffsetPos[1], dtype=float)))
+
+            elif args[0] == 1:
+                if self.game.currentIsland.currentObject < len(self.game.currentIsland.objects)-1:
+                    self.game.currentIsland.currentObject += 1
+                    targetObject = self.game.currentIsland.objects[self.game.currentIsland.currentObject]
+                    self.game.player[0].pos = np.array(
+                        tilePosToPos(targetObject.pos + np.array(targetObject.playerOffsetPos[0], dtype=float)))
+                elif self.game.currentIslandIndex < len(self.game.islands) - 1:
+                    self.game.currentIslandIndex += 1
+                    self.game.currentIsland = self.game.islands[self.game.currentIslandIndex]
+
+                    targetObject = self.game.currentIsland.objects[self.game.currentIsland.currentObject]
+                    self.game.player[0].pos = np.array(
+                        tilePosToPos(targetObject.pos + np.array(targetObject.playerOffsetPos[1], dtype=float)))
 
     def mine(self, element):
         if self.prvElement == element:
-            self.combo += 1
+            #calc added feature
+            addedCombo = self.game.currentIsland.upgrades['add'] + self.game.currentIsland.objects[self.game.currentIsland.currentObject].upgrades['add']
+            self.combo += addedCombo
         else:
             if self.combo > 200:
                 self.game.soundAssets['fail200'].play()

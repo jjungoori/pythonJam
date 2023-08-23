@@ -98,9 +98,9 @@ class Renderer:
         zoomedScreen.blit(txt,  np.array((20,20)))
         txt = game.font.render(str(game.gameManager.water), True, (100, 100, 200))
         zoomedScreen.blit(txt, np.array((20,40)))
-        txt = game.font.render(str(game.gameManager.air), True, (150, 150, 200))
+        txt = game.font.render(str(game.gameManager.air), True, (90, 90, 120))
         zoomedScreen.blit(txt, np.array((20,60)))
-        txt = game.font.render(str(game.gameManager.lightening), True, (150, 150, 100))
+        txt = game.font.render(str(game.gameManager.lightening), True, (160, 160, 100))
         zoomedScreen.blit(txt, np.array((20,80)))
 
         #---------------------------------------

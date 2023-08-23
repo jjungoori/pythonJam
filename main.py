@@ -96,9 +96,13 @@ class Game:
             # Island((1,8), self.tilemaps['object'], 'resources/map/firstIsland.csv', (5,5), [])
         ]
         self.islands = [
-            getIsland('resources/map/basicIsland.json', self)
+            getIsland('resources/map/basicIsland.json', self),
+            getIsland('resources/map/secondIsland.json', self)
         ]
+
+        self.currentIslandIndex = 0
         self.currentIsland = self.islands[0]
+
         self.UIs = {
             # 'panel' : pygame_gui.elements.UIPanel(relative_rect = pygame.Rect(100,100,100,100), starting_height=1000, manager = self.ui),
             'button' : pygame_gui.elements.UIButton(relative_rect= (0,0), text = "hello", manager = self.ui),

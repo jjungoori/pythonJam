@@ -103,13 +103,13 @@ class TileMine(TileObject):
         self.tileMatch = {
             1 : [[48, 70, 92], [115, 137, 159]],
             0 : [[114, 136, 158], [49, 71, 93]],
-            2 : [],
-            3 : []
+            3 : [[50, 72, 94], [117, 139, 161]],
+            2 : [[116, 138, 160], [51, 73, 95]]
         }
-        self.tiles = np.array([[1,0],[1,0],[1,0]])
         self.on = False
         self.upgrades = upgrades
         self.elements = elements
+        self.tiles = np.array([self.elements, self.elements, self.elements])
         self.readyObject = GameObject(Animation(load_images('entity/spawner'), loop=False, img_dur=4, start = False), tilePosToPos(self.pos))
         self.readyObject.pos[1] -= 16
         self.game = game
@@ -152,9 +152,11 @@ class TileMine(TileObject):
         self.tiles[1] = self.tiles[0]
         l = random.randint(0,1)
         if l == 0:
-            r = 1
+            r = self.elements[0]
+            l = self.elements[1]
         else:
-            r = 0
+            r = self.elements[1]
+            l = self.elements[0]
         self.tiles[0] = np.array([l, r], dtype=int)
 
         self.sync()
@@ -176,10 +178,12 @@ class Island(TileObject):
 
         super().__init__(pos, targetTilemap, csvStructure)
         self.type = 'whiteLand'
-        self.level = 0
-        self.start = ()
-        self.end = ()
+        self.level = level
+        self.start = start
+        self.end = end
         self.currentObject = 0
+        self.upgrades = upgrades
+        self.type = type
 
     def run(self):
         # print("B")
