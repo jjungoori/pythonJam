@@ -9,19 +9,26 @@ class EventHandler:
         self.left = 0
         self.right = 0
 
+        self.btnOns = []
+
     def update(self):
+
         for event in pygame.event.get():
             if event.type == pygame.QUIT:
                 pygame.quit()
                 sys.exit()
             elif event.type == pygame.MOUSEBUTTONDOWN:
-                if self.game.renderer.uiEvent():
+                a = self.game.renderer.uiEvent()
+                if a:
+                    self.btnOns.append(a[1])
                     continue
                 if pygame.mouse.get_pos()[0] <= SCREEN_WIDTH/2:
                     self.leftC()
                 else:
                     self.rightC()
             elif event.type == pygame.MOUSEBUTTONUP:
+                for i in self.btnOns:
+                    i()
                 self.up()
             elif event.type == pygame.KEYDOWN:
                 if event.key == pygame.K_SPACE:

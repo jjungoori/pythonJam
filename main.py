@@ -35,7 +35,9 @@ class Game:
             'ui/mine.png': 0,
             'ui/upgrade.png': 0,
             'ui/move.png': 0,
-            'ui/UIBG.png' : 0
+            'ui/UIBG.png' : 0,
+            'ui/smallBtn.png' : 0,
+            'ui/smallBtnPressed.png' : 0
             # 'ui/upgradeAdd' : 1
         }
 
@@ -55,7 +57,7 @@ class Game:
                         self.assets[i][l].set_alpha(70)
 
 
-        self.gameManager = GameManager(self)
+
 
         self.font = pygame.font.Font('resources/stardust.ttf')
         self.largeFont = pygame.font.Font('resources/stardust.ttf', 40)
@@ -112,7 +114,7 @@ class Game:
 
         self.currentIslandIndex = 0
         self.currentIsland = self.islands[0]
-
+        self.gameManager = GameManager(self)
         self.UIs = {
             # 'panel' : pygame_gui.elements.UIPanel(relative_rect = pygame.Rect(100,100,100,100), starting_height=1000, manager = self.ui),
             'button' : pygame_gui.elements.UIButton(relative_rect= (0,0), text = "hello", manager = self.ui),

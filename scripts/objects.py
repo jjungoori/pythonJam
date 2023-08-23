@@ -166,6 +166,9 @@ class TileMine(TileObject):
         self.game.gameManager.mine(getTiles[lr])
         return getTiles[lr]
 
+    def upgradeAdd(self, *args):
+        return
+
 def getIsland(jsonFile, game):
     with open(jsonFile, 'r') as file:
         data = json.load(file)
@@ -182,15 +185,21 @@ class Island(TileObject):
         self.level = level
         self.start = start
         self.end = end
-        self.currentObject = 0
+        self.currentObjectIndex = 0
+        self.currentObject = self.objects[self.currentObjectIndex]
         self.upgrades = upgrades
         self.type = type
 
+    def sync(self):
+        self.currentObject = self.objects[self.currentObjectIndex]
     def run(self):
         # print("B")
         self.objects = getObjectsFromDict(self.objects, self.game, self.pos)
         # self.loadStructureFromCsv()
         # self.placeOnTilemap()
+
+    def upgradeAdd(self, *args):
+        return
 
 
 def getObjectsFromDict(objsDict, game, pos):

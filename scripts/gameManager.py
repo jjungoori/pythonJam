@@ -1,3 +1,5 @@
+# import curses
+
 import  pygame
 from scripts.objects import *
 import  numpy as np
@@ -8,7 +10,25 @@ class GameManager:
     def __init__(self, game):
         self.game = game
 
-        self.menu = Menu(self.game)
+        self.menus = [
+            Menu(self.game, [
+                MenuItems(None,
+                          ImageButton(images=[game.assets['ui/smallBtn.png'], game.assets['ui/smallBtnPressed.png']],
+                                      pos=(0, 0), func=self.game.currentIsland.currentObject.upgradeAdd), 'island', 'add 1 combo per click'),
+            ]),
+            Menu(self.game, [
+                MenuItems(None,
+                          ImageButton(images=[game.assets['ui/smallBtn.png'], game.assets['ui/smallBtnPressed.png']],
+                                      pos=(0, 0), func=self.game.currentIsland.upgradeAdd), 'mine', 'add 1 combo per click'),
+            ]),
+            Menu(self.game, [
+                MenuItems(None,
+                          ImageButton(images=[game.assets['ui/smallBtn.png'], game.assets['ui/smallBtnPressed.png']],
+                                      pos=(0, 0), func=self.changeAct), 'new', 'add 1 combo per click'),
+            ])
+        ]
+        self.menuIndex = 0
+        self.menu = self.menus[self.menuIndex]
         #for mines
         self.combo = 0
         self.prvElement = -1
@@ -24,7 +44,7 @@ class GameManager:
     def act(self, *args):
 
         if self.action == 0:
-            targetObject = self.game.currentIsland.objects[self.game.currentIsland.currentObject]
+            targetObject = self.game.currentIsland.currentObject
             if type(targetObject) == TileMine:
                 if not targetObject.on:
                     if not targetObject.working:
@@ -34,39 +54,48 @@ class GameManager:
                     targetObject.mine(args[0])
         elif self.action == 1:
             if args[0] == 0:
-                if self.game.currentIsland.currentObject > 0:
+                if self.game.currentIsland.currentObjectIndex > 0:
 
-                    self.game.currentIsland.currentObject -= 1
-                    targetObject = self.game.currentIsland.objects[self.game.currentIsland.currentObject]
+                    self.game.currentIsland.currentObjectIndex -= 1
+                    self.game.currentIsland.sync()
+                    targetObject = self.game.currentIsland.currentObject
                     self.game.player[0].pos = np.array(
                         tilePosToPos(targetObject.pos + np.array(targetObject.playerOffsetPos[1], dtype=float)))
                 elif self.game.currentIslandIndex > 0:
                     self.game.currentIslandIndex -= 1
                     self.game.currentIsland = self.game.islands[self.game.currentIslandIndex]
 
-                    targetObject = self.game.currentIsland.objects[self.game.currentIsland.currentObject]
+                    targetObject = self.game.currentIsland.currentObject
                     self.game.player[0].pos = np.array(
                         tilePosToPos(targetObject.pos + np.array(targetObject.playerOffsetPos[1], dtype=float)))
             elif args[0] == 1:
-                if self.game.currentIsland.currentObject < len(self.game.currentIsland.objects)-1:
-                    self.game.currentIsland.currentObject += 1
-                    targetObject = self.game.currentIsland.objects[self.game.currentIsland.currentObject]
+                if self.game.currentIsland.currentObjectIndex < len(self.game.currentIsland.objects)-1:
+                    self.game.currentIsland.currentObjectIndex += 1
+                    self.game.currentIsland.sync()
+                    targetObject = self.game.currentIsland.currentObject
                     self.game.player[0].pos = np.array(
                         tilePosToPos(targetObject.pos + np.array(targetObject.playerOffsetPos[0], dtype=float)))
                 elif self.game.currentIslandIndex < len(self.game.islands) - 1:
                     self.game.currentIslandIndex += 1
                     self.game.currentIsland = self.game.islands[self.game.currentIslandIndex]
 
-                    targetObject = self.game.currentIsland.objects[self.game.currentIsland.currentObject]
+                    targetObject = self.game.currentIsland.currentObject
                     self.game.player[0].pos = np.array(
                         tilePosToPos(targetObject.pos + np.array(targetObject.playerOffsetPos[1], dtype=float)))
         elif self.action == 2:
-            self.menu.on = args[0] == 1
+            if(args[0] == 1):
+                self.menuIndex += 1
+                if self.menuIndex > 2:
+                    self.menuIndex = 0
+                self.menu = self.menus[self.menuIndex]
+                self.menu.on = True
+            else:
+                self.menu.on = False
 
     def mine(self, element):
         if self.prvElement == element:
             #calc added feature
-            addedCombo = self.game.currentIsland.upgrades['add'] + self.game.currentIsland.objects[self.game.currentIsland.currentObject].upgrades['add']
+            addedCombo = self.game.currentIsland.upgrades['add'] + self.game.currentIsland.currentObject.upgrades['add']
             self.combo += addedCombo
         else:
             if self.combo > 200:
@@ -91,6 +120,7 @@ class GameManager:
 
 
     def changeAct(self):
+        self.menu.on = False
         self.game.soundAssets['change'].play()
         self.action += 1
         if self.action > 2:
@@ -104,14 +134,10 @@ class MenuItems:
         self.title = title
         self.description = description
 class Menu:
-    def __init__(self, game):
+    def __init__(self, game, items):
         self.on = False
         self.game = game
-        self.items = [
-            MenuItems(None, ImageButton(image=game.assets['ui/leftBtn.png'], pos=(0,0), func=self.upgradeAdd), 'Add', 'add 1 combo per click'),
-            # MenuItems(None, None, 'Add', 'add 2 combo per click'),
-            # MenuItems(None, None, 'Add', 'add 3 combo per click')
-        ]
+        self.items = items
 
     def upgradeAdd(self):
         self.game.currentIsland.upgrades['add'] += 1
