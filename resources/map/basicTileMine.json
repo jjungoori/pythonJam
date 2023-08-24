@@ -1,7 +1,9 @@
 {
   "csvStructure" : "resources/map/tilemine.csv",
   "upgrades" : {
-    "add" : 1
+    "fireAdd" : 0,
+    "airAdd" : 0,
+    "waterAdd" : 0
   },
   "elements" : [0, 2]
 }

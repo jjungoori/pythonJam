@@ -104,7 +104,7 @@ class Renderer:
         zoomedScreen.blit(txt,  np.array((20,20)))
         txt = game.font.render(str(game.gameManager.water), True, (100, 100, 200))
         zoomedScreen.blit(txt, np.array((20,40)))
-        txt = game.font.render(str(game.gameManager.air), True, (90, 90, 120))
+        txt = game.font.render(str(game.gameManager.air), True, (92, 154, 159))
         zoomedScreen.blit(txt, np.array((20,60)))
         txt = game.font.render(str(game.gameManager.lightening), True, (160, 160, 100))
         zoomedScreen.blit(txt, np.array((20,80)))
@@ -114,23 +114,43 @@ class Renderer:
             ti = game.assets['ui/UIBG.png']
             bgPos = center(ti, (0,0)) -np.array((0,50))
             zoomedScreen.blit(ti, bgPos)
+
+            txt = game.largeFont.render(menu.title, True, (255, 255, 255))
+            zoomedScreen.blit(txt, colCenter(txt, bgPos) - np.array((0,15)))
+
+            # zoomedScreen.blit(txt, np.array((20, 80)))
+
             bgPos += np.array((0, 20))
 
             for i in range(len(menu.items)):
                 menuItem = menu.items[i]
-                if menuItem.image:
-                    ti = menuItem.image
-                    zoomedScreen.blit(ti, bgPos + np.array((20,20 + 80*i)))
+                # if menuItem.image:
+                #     ti = menuItem.image
+                #     zoomedScreen.blit(ti, bgPos + np.array((20,20 + 80*i)))
                 txt = game.middleFont.render(menuItem.title, True, (220, 220, 220))
-                zoomedScreen.blit(txt, bgPos + np.array((40,20 + 80*i)))
+                zoomedScreen.blit(txt, bgPos + np.array((40,20 + 100*i)))
 
                 txt = game.font.render(menuItem.description, True, (150, 150, 150))
-                zoomedScreen.blit(txt, bgPos + np.array((40,50 + 80*i)))
+                zoomedScreen.blit(txt, bgPos + np.array((40,50 + 100*i)))
 
-                btnPos = bgPos + np.array((txt.get_width() + 50, 20 + 80*i))
-                menuItem.button.pos = np.array(btnPos)
-                menuItem.button.fixColl()
-                zoomedScreen.blit(menuItem.button.image, btnPos)
+                if menuItem.button != 0:
+                    btnPos = bgPos + np.array((265, 55 + 100 * i))
+                    menuItem.button.pos = np.array(btnPos)
+                    menuItem.button.fixColl()
+                    zoomedScreen.blit(menuItem.button.image, btnPos)
+
+                    txt1 = game.font.render(str(menuItem.cost[0]), True, (200, 100, 100))
+                    txt1Pos = bgPos + np.array((40, 100*i + 80))
+                    zoomedScreen.blit(txt1, txt1Pos)
+                    txt2 = game.font.render(str(menuItem.cost[1]), True, (100, 100, 200))
+                    txt2Pos = txt1Pos + np.array((txt1.get_width() + 10, 0))
+                    zoomedScreen.blit(txt2, txt2Pos)
+                    txt3 = game.font.render(str(menuItem.cost[2]), True, (92, 154, 159))
+                    txt3Pos = txt2Pos + np.array((txt2.get_width() + 10, 0))
+                    zoomedScreen.blit(txt3,txt3Pos)
+                    txt4 = game.font.render(str(menuItem.cost[3]), True, (160, 160, 100))
+                    txt4Pos = txt3Pos + np.array((txt3.get_width() + 10, 0))
+                    zoomedScreen.blit(txt4, txt4Pos)
 
 
                 txt = game.font.render('+', True, (200, 0, 0))
@@ -152,6 +172,8 @@ class Renderer:
 
         for i in self.game.gameManager.menu.items:
             print("this ca")
+            if i.button == 0:
+                continue
             a = i.button.update()
             if a[0]:
                 print(';;')
@@ -175,7 +197,7 @@ class ImageButton:
     def update(self):
         mp = pygame.mouse.get_pos()
         if mp[0] < self.end[0] and mp[0] > self.start[0] and mp[1] < self.end[1] and mp[1] > self.start[1]:
-            self.func(self.args[0])
+            self.func()
             self.image = self.images[1]
             return True, self.up
 

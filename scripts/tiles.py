@@ -9,7 +9,7 @@ class Tileset:
         self.size = size
         self.margin = margin
         self.spacing = spacing
-        self.image = file # Ensure the image has an alpha channel
+        self.image = file
         self.rect = self.image.get_rect()
         self.tiles = []
         self.tileImagePaths = []
@@ -25,7 +25,7 @@ class Tileset:
 
         for y in range(y0, h, dy):
             for x in range(x0, w, dx):
-                tile = pygame.Surface(self.size, pygame.SRCALPHA) # Create a surface with an alpha channel
+                tile = pygame.Surface(self.size, pygame.SRCALPHA)
                 tile.blit(self.image, (0, 0), (x, y, *self.size))
                 self.tiles.append(tile)
 
