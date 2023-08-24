@@ -13,19 +13,21 @@ class GameManager:
         self.menus = [
             Menu(self.game, [
                 MenuItems(None,
-                          ImageButton(images=[game.assets['ui/smallBtn.png'], game.assets['ui/smallBtnPressed.png']],
-                                      pos=(0, 0), func=self.game.currentIsland.currentObject.upgradeAdd), 'island', 'add 1 combo per click'),
+                          ImageButton([game.assets['ui/smallBtn.png'], game.assets['ui/smallBtnPressed.png']],
+                                      (0, 0), self.game.currentIsland.upgrade, 'add'), 'island', 'add 1 combo per click'),
             ]),
             Menu(self.game, [
                 MenuItems(None,
-                          ImageButton(images=[game.assets['ui/smallBtn.png'], game.assets['ui/smallBtnPressed.png']],
-                                      pos=(0, 0), func=self.game.currentIsland.upgradeAdd), 'mine', 'add 1 combo per click'),
+                          ImageButton([game.assets['ui/smallBtn.png'], game.assets['ui/smallBtnPressed.png']],
+                                      (0, 0), self.game.currentIsland.currentObject.upgrade, 'add'), 'mine',
+                          'add 2 combo per click'),
             ]),
             Menu(self.game, [
                 MenuItems(None,
-                          ImageButton(images=[game.assets['ui/smallBtn.png'], game.assets['ui/smallBtnPressed.png']],
-                                      pos=(0, 0), func=self.changeAct), 'new', 'add 1 combo per click'),
-            ])
+                          ImageButton([game.assets['ui/smallBtn.png'], game.assets['ui/smallBtnPressed.png']],
+                                      (0, 0), self.game.currentIsland.currentObject.upgrade, 'add'), 'new',
+                          'add 1 combo per click'),
+            ]),
         ]
         self.menuIndex = 0
         self.menu = self.menus[self.menuIndex]
@@ -119,7 +121,7 @@ class GameManager:
         return
 
 
-    def changeAct(self):
+    def changeAct(self, *args):
         self.menu.on = False
         self.game.soundAssets['change'].play()
         self.action += 1
@@ -139,5 +141,7 @@ class Menu:
         self.game = game
         self.items = items
 
-    def upgradeAdd(self):
-        self.game.currentIsland.upgrades['add'] += 1
+    def upgrade(self, *args):
+        self.game.currentIsland.upgrades[args[0]] += 1
+
+    def updateFromMine(self):

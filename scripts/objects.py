@@ -166,9 +166,11 @@ class TileMine(TileObject):
         self.game.gameManager.mine(getTiles[lr])
         return getTiles[lr]
 
-    def upgradeAdd(self, *args):
+    def upgrade(self, *args):
+        if args[0] not in self.upgrades:
+            self.upgrades[args[0]] = 0
+        self.upgrades[args[0]] += 1
         return
-
 def getIsland(jsonFile, game):
     with open(jsonFile, 'r') as file:
         data = json.load(file)
@@ -198,7 +200,11 @@ class Island(TileObject):
         # self.loadStructureFromCsv()
         # self.placeOnTilemap()
 
-    def upgradeAdd(self, *args):
+    def upgrade(self, *args):
+        print(args[0])
+        if args[0] not in self.upgrades:
+            self.upgrades[args[0]] = 0
+        self.upgrades[args[0]] += 1
         return
 
 

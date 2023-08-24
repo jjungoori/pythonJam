@@ -22,7 +22,7 @@ class Renderer:
         self.actionImages = []
     def run(self):
         ti = self.game.assets['ui/mine.png']
-        self.interactiveUIs['actionButton'] = (ImageButton([self.game.assets['ui/mine.png'], self.game.assets['ui/mine.png']], colCenter(ti, bottom(ti, (0,0))), self.game.gameManager.changeAct))
+        self.interactiveUIs['actionButton'] = (ImageButton([self.game.assets['ui/mine.png'], self.game.assets['ui/mine.png']], colCenter(ti, bottom(ti, (0,0))), self.game.gameManager.changeAct, 'add'))
         self.actionImages = [
             self.game.assets['ui/mine.png'],
             self.game.assets['ui/move.png'],
@@ -161,12 +161,13 @@ class Renderer:
         return rt
 
 class ImageButton:
-    def __init__(self, images, pos, func):
+    def __init__(self, images, pos, func, *args):
         self.images = images
         self.image = self.images[0]
         self.start = pos
         self.end = pos + np.array((self.image.get_width(), self.image.get_height()))
         self.func = func
+        self.args = args
 
     def fixColl(self):
         self.start = self.pos
@@ -174,7 +175,7 @@ class ImageButton:
     def update(self):
         mp = pygame.mouse.get_pos()
         if mp[0] < self.end[0] and mp[0] > self.start[0] and mp[1] < self.end[1] and mp[1] > self.start[1]:
-            self.func()
+            self.func(self.args[0])
             self.image = self.images[1]
             return True, self.up
 
