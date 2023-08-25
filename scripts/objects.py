@@ -192,6 +192,13 @@ def getIsland(jsonFile, game):
         print('json imported')
         return Island(**data, targetTilemap=game.tilemaps['main'], game=game)
 
+def getNewIsland(jsonFile, game): # don't care the tilemines
+    with open(jsonFile, 'r') as file:
+        data = json.load(file)
+        print('json imported')
+        island =  Island(**data, targetTilemap=game.tilemaps['main'], game=game)
+        island.resetObjects()
+
 class Island(TileObject):
     def __init__(self, pos, csvStructure, targetTilemap, objs, level, type, start, end, upgrades, game):
         self.objects = objs
@@ -206,6 +213,10 @@ class Island(TileObject):
         self.currentObject = self.objects[self.currentObjectIndex]
         self.upgrades = upgrades
         self.type = type
+
+    def resetObjects(self):
+        for i in range(len(self.objects)):
+            self.objects[i] = getRandomTileMine(self.objects[i].pos, self.game)
 
     def sync(self):
         self.currentObject = self.objects[self.currentObjectIndex]
