@@ -95,6 +95,21 @@ def getTileMine(jsonFile, pos, game):
     with open(jsonFile, 'r') as file:
         data = json.load(file)
         return TileMine(**data, targetTilemap=game.tilemaps['object'], game = game, pos = pos)
+   #
+def getRandomTileMine(pos, game):
+    upgradeVal = random.randint(0, game.gameManager.maxChance)
+    upgrades = {}
+
+    for i in game.gameManager.upgradeChances:
+        if game.gameManager.upgradeChances[i] >= upgradeVal:
+            upgrades[i] = 0
+
+    a  = [0, 1, 2, 3]
+    return TileMine(
+        targetTilemap=game.tilemaps['object'], game = game, pos = pos, csvStructure="resources/map/tilemine.csv",
+        elements=(a.pop(random.randint(0,3)), a.pop(random.randint(0,2))),
+        upgrades=upgrades
+    )
 
 class TileMine(TileObject):
 
@@ -216,6 +231,7 @@ def getObjectsFromDict(objsDict, game, pos):
             for l in objsDict[i]:
                 # print(l)
                 temp = getTileMine(l[0], pos + np.array(l[1]), game=game)
+                # temp = getRandomTileMine(pos + np.array(l[1]), game = game)
                 objs.append(temp)
     print(objs)
     return objs

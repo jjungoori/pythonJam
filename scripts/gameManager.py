@@ -15,6 +15,14 @@ class GameManager:
         with open('resources/map/mineUpgrades.json', 'r') as file:
             data = json.load(file)
             self.mineUpgrades = data
+        self.upgradeChances = {}
+
+        chanceGen = 0
+        for i in data:
+            print(i)
+            chanceGen += data[i]['chance']
+            self.upgradeChances[i] = chanceGen
+        self.maxChance = chanceGen
 
         # self.menus = [
         #     Menu(self.game, [

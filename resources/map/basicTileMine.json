@@ -3,7 +3,7 @@
   "upgrades" : {
     "fireAdd" : 0,
     "airAdd" : 0,
-    "waterAdd" : 0
+    "add" : 0
   },
   "elements" : [0, 2]
 }

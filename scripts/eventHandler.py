@@ -1,6 +1,7 @@
 import pygame
 import sys
 from scripts.constants import *
+from scripts.gameManager import *
 
 class EventHandler:
 
@@ -57,6 +58,8 @@ class EventHandler:
                     self.game.movement[3] = False
                     pass
                 if event.key == pygame.K_q:
+
+                    self.game.currentIsland.currentObject = getRandomTileMine(game = self.game, pos = self.game.currentIsland.currentObject.pos)
                     pass
                     # self.game.currentIsland.objects[0].spawnTileObject(self.game)
 

@@ -10,7 +10,8 @@
       "all + 1", "all + 1", "all + 1","MAX"
     ],
     "title" : "Add",
-    "image" : 0
+    "image" : 0,
+    "chance" :  10
   },
 
   "fireAdd" : {
@@ -24,7 +25,8 @@
       "fire + 3", "fire + 2","fire + 1","MAX"
     ],
     "title" : "Fire Add",
-    "image" : "ui/elements/0.png"
+    "image" : "ui/elements/0.png",
+    "chance" :  10
   },
 
   "waterAdd" : {
@@ -38,7 +40,8 @@
       "water + 3", "water + 2", "water + 1", "MAX"
     ],
     "title" : "Water Add",
-    "image" : "ui/elements/1.png"
+    "image" : "ui/elements/1.png",
+    "chance" :  10
   },
 
   "airAdd" : {
@@ -52,7 +55,8 @@
       "air + 3", "air + 2", "air + 1", "MAX"
     ],
     "title" : "Air Add",
-    "image" : "ui/elements/2.png"
+    "image" : "ui/elements/2.png",
+    "chance" :  10
 
   }
 }

@@ -153,8 +153,6 @@ class Renderer:
                     zoomedScreen.blit(txt4, txt4Pos)
 
 
-                txt = game.font.render('+', True, (200, 0, 0))
-                zoomedScreen.blit(txt, (192, 372))
 
         #---------------------------------------
         self.screen.blit(zoomedScreen, (0, 0))
