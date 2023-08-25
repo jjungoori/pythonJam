@@ -94,7 +94,7 @@ class TileObject:
 def getTileMine(jsonFile, pos, game):
     with open(jsonFile, 'r') as file:
         data = json.load(file)
-        return TileMine(**data, targetTilemap=game.tilemaps['object'], game = game, pos = pos)
+        return TileMine(**data, targetTilemap=game.gameManager.tilemaps['object'], game = game, pos = pos)
    #
 def getRandomTileMine(pos, game):
     upgradeVal = random.randint(0, game.gameManager.maxChance)
@@ -106,7 +106,7 @@ def getRandomTileMine(pos, game):
 
     a  = [0, 1, 2, 3]
     return TileMine(
-        targetTilemap=game.tilemaps['object'], game = game, pos = pos, csvStructure="resources/map/tilemine.csv",
+        targetTilemap=game.gameManager.tilemaps['object'], game = game, pos = pos, csvStructure="resources/map/tilemine.csv",
         elements=(a.pop(random.randint(0,3)), a.pop(random.randint(0,2))),
         upgrades=upgrades
     )
@@ -129,28 +129,28 @@ class TileMine(TileObject):
         self.readyObject = GameObject(Animation(load_images('entity/spawner'), loop=False, img_dur=4, start = False), tilePosToPos(self.pos))
         self.readyObject.pos[1] -= 16
         self.game = game
-        self.game.objects.append(self.readyObject)
+        self.game.gameManager.objects.append(self.readyObject)
         self.playerOffsetPos = ((-0.25,2), (1.25,2))
         self.prvElement = -1
         print("tilemineSpawned")
         # self.sync()
 
     def spawnTileObject(self, game):
-        game.soundAssets['mineSpawnStart'].play()
+        game.assets.sounds['mineSpawnStart'].play()
         # print(tilePosToPos(self.pos))
         self.readyObject.animation.start = True
         def temp():
-            game.soundAssets['mineSpawn'].play()
+            game.assets.sounds['mineSpawn'].play()
             game.renderer.shake = 30
-            game.objects.remove(self.readyObject)
+            game.gameManager.objects.remove(self.readyObject)
             for i in range(100):
-                game.particles.append(
+                game.gameManager.particles.append(
                     Particle(tilePosToPos(self.pos+np.array((1,0.5+3.5/100*i),int)), ((random.random() - 0.5) * 20, (random.random() - 0.5) * 20), 5.0,
                              random.random() + 0.01,
                              (random.random() * 255, random.random() * 255, random.random() * 255), 0, 0))
             self.on = True
             self.sync()
-        game.timer.add(self.readyObject.animation.img_duration*len(self.readyObject.animation.images)*10+2000, temp)
+        game.gameManager.timer.add(self.readyObject.animation.img_duration*len(self.readyObject.animation.images)*10+2000, temp)
 
 
     def sync(self):
@@ -160,9 +160,9 @@ class TileMine(TileObject):
             self.structure[i][1] = self.tileMatch[self.tiles[i][1]][1][i]
         self.placeOnTilemap()
     def mine(self, lr):
-        self.game.soundAssets['mine'].play()
-        # print(tilePosToPos(self.pos + np.array(self.playerOffsetPos[lr])), self.game.player[0].pos)
-        self.game.player[0].pos = np.array(tilePosToPos(self.pos + np.array(self.playerOffsetPos[lr], dtype=float)))
+        self.game.assets.sounds['mine'].play()
+        # print(tilePosToPos(self.pos + np.array(self.playerOffsetPos[lr])), self.game.gameManager.player[0].pos)
+        self.game.gameManager.player[0].pos = np.array(tilePosToPos(self.pos + np.array(self.playerOffsetPos[lr], dtype=float)))
         getTiles = (self.tiles[2][0], self.tiles[2][1])
         self.tiles[2] = self.tiles[1]
         self.tiles[1] = self.tiles[0]
@@ -190,13 +190,13 @@ def getIsland(jsonFile, game):
     with open(jsonFile, 'r') as file:
         data = json.load(file)
         print('json imported')
-        return Island(**data, targetTilemap=game.tilemaps['main'], game=game)
+        return Island(**data, targetTilemap=game.gameManager.tilemaps['main'], game=game)
 
 def getNewIsland(jsonFile, game): # don't care the tilemines
     with open(jsonFile, 'r') as file:
         data = json.load(file)
         print('json imported')
-        island =  Island(**data, targetTilemap=game.tilemaps['main'], game=game)
+        island =  Island(**data, targetTilemap=game.gameManager.tilemaps['main'], game=game)
         island.resetObjects()
 
 class Island(TileObject):

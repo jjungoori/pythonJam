@@ -19,7 +19,7 @@ class EventHandler:
                 pygame.quit()
                 sys.exit()
             elif event.type == pygame.MOUSEBUTTONDOWN:
-                a = self.game.renderer.uiEvent()
+                a = self.game.UIManager.uiEvent()
                 if a:
                     self.btnOns.append(a[1])
                     continue
@@ -35,16 +35,16 @@ class EventHandler:
                 if event.key == pygame.K_SPACE:
                     self.game.gameManager.changeAct()
                 if event.key == pygame.K_LEFT:
-                    # self.game.movement[0] = True
+                    # self.game.gameManager.movement[0] = True
                     self.leftC()
                 elif event.key == pygame.K_RIGHT:
-                    # self.game.movement[1] = True
+                    # self.game.gameManager.movement[1] = True
                     self.rightC()
                 elif event.key == pygame.K_UP:
-                    self.game.movement[2] = True
+                    self.game.gameManager.movement[2] = True
                     pass
                 elif event.key == pygame.K_DOWN:
-                    self.game.movement[3] = True
+                    self.game.gameManager.movement[3] = True
                     pass
             elif event.type == pygame.KEYUP:
                 if event.key == pygame.K_LEFT:
@@ -52,10 +52,10 @@ class EventHandler:
                 if event.key == pygame.K_RIGHT:
                     self.up()
                 if event.key == pygame.K_UP:
-                    self.game.movement[2] = False
+                    self.game.gameManager.movement[2] = False
                     pass
                 if event.key == pygame.K_DOWN:
-                    self.game.movement[3] = False
+                    self.game.gameManager.movement[3] = False
                     pass
                 if event.key == pygame.K_q:
                     self.game.islands.append(Island(
