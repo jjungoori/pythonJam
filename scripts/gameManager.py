@@ -192,14 +192,21 @@ class GameManager:
                 elif self.game.UIManager.menuIndex == 1:
                     self.game.UIManager.menu.updateFromIsland(self.game.gameManager.currentIsland)
 
-                self.game.UIManager.menu.on = True
+                # self.game.UIManager.menu.on = True
             else:
-                self.game.UIManager.menu.on = False
+                self.game.UIManager.menuIndex -= 1
+                if self.game.UIManager.menuIndex < 0:
+                    self.game.UIManager.menuIndex = 2
+                # self.game.UIManager.menu = self.game.UIManager.menus[self.game.UIManager.menuIndex]
+                if self.game.UIManager.menuIndex == 0:
+                    self.game.UIManager.menu.updateFromMine(self.game.gameManager.currentIsland.currentObject)
+                elif self.game.UIManager.menuIndex == 1:
+                    self.game.UIManager.menu.updateFromIsland(self.game.gameManager.currentIsland)
 
     def mine(self, element):
         if self.prvElement == element:
             #calc added feature
-            addedCombo = 1000
+            addedCombo = 10000
             if 'add' in self.game.gameManager.currentIsland.currentObject.upgrades:
                 addedCombo += self.mineUpgrades['add']['values'][self.game.gameManager.currentIsland.currentObject.upgrades['add']]
 
@@ -237,6 +244,10 @@ class GameManager:
     def changeAct(self, *args):
         self.game.assets.sounds['change'].play()
         self.action += 1
+        if self.action == 2:
+            self.game.UIManager.menu.on = True
+        else:
+            self.game.UIManager.menu.on = False
         if self.action > 2:
             self.action = 0
         # self.game.UIManager.menu.changeAct(self.action)
