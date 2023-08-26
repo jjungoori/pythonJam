@@ -30,7 +30,6 @@ class GameManager:
                 size=(WORLD_HEIGHT, WORLD_WIDTH))
         }
         self.now = 0
-        self.timer = Timer()
         self.player = Player(self.game.assets.images["player/idle"], tilePosToPos((14, 8))),
         self.particles = []
         self.objects = []
@@ -123,7 +122,7 @@ class GameManager:
             prevTime = self.now
             timeCounter += dt
 
-            self.timer.update()
+            self.game.timer.update()
             # Update logic here
 
             self.game.eventHandler.update()
@@ -240,7 +239,7 @@ class GameManager:
         self.action += 1
         if self.action > 2:
             self.action = 0
-        self.game.UIManager.menu.changeAct(self.action)
+        # self.game.UIManager.menu.changeAct(self.action)
 
 
 

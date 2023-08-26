@@ -150,7 +150,7 @@ class TileMine(TileObject):
                              (random.random() * 255, random.random() * 255, random.random() * 255), 0, 0))
             self.on = True
             self.sync()
-        game.gameManager.timer.add(self.readyObject.animation.img_duration*len(self.readyObject.animation.images)*10+2000, temp)
+        game.timer.add(self.readyObject.animation.img_duration*len(self.readyObject.animation.images)*10+2000, temp)
 
 
     def sync(self):

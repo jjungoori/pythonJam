@@ -4,7 +4,7 @@ from functools import partial
 
 class UIManager:
     def __init__(self, game):
-        self.interactiveUIs = {}
+        self.interactiveUIs = 0
         self.actionImages = []
         self.game = game
         self.menuIndex = 0
@@ -13,7 +13,7 @@ class UIManager:
 
     def run(self):
         ti = self.game.assets.images['ui/mine.png']
-        self.interactiveUIs['actionButton'] = (ImageButton([self.game.assets.images['ui/mine.png'], self.game.assets.images['ui/mine.png']], colCenter(ti, bottom(ti, (0, 0))), self.game.UIManager.menu.changeAct, 'add'))
+        self.actionButton = ImageButton([self.game.assets.images['ui/mine.png'], self.game.assets.images['ui/mine.png']], colCenter(ti, bottom(ti, (0, 0))), self.game.UIManager.menu.changeAct, 'add')
         self.actionImages = [
             self.game.assets.images['ui/mine.png'],
             self.game.assets.images['ui/move.png'],
@@ -31,8 +31,8 @@ class UIManager:
         ti = rightBtns[self.game.eventHandler.right]
         zoomedScreen.blit(ti, colCenter(ti, bottom(ti, (0, 0))) + np.array((130, -20)))
         print(self.game.gameManager.action, len(self.actionImages))
-        self.interactiveUIs['actionButton'].image = self.actionImages[self.game.gameManager.action]
-        ti = self.interactiveUIs['actionButton']
+        self.actionButton.image = self.actionImages[self.game.gameManager.action]
+        ti = self.actionButton
         zoomedScreen.blit(ti.image, ti.start)
 
         # zoomedScreen.blit(self.game.assets.font.render("Elemental", True, (0,0,0)), (10,10))
@@ -101,10 +101,9 @@ class UIManager:
 
         rt = False
 
-        for i in self.interactiveUIs:
-            a = self.interactiveUIs[i].update(self.game.gameManager.action)
-            if a[0]:
-                rt = (True, a[1])
+        a = self.actionButton.update(self.game.gameManager.action)
+        if a[0]:
+            rt = (True, a[1])
 
         for i in self.game.UIManager.menu.items:
             print("this ca")
@@ -180,8 +179,9 @@ class GameMenu:
             self.updateFromMine(self.game.gameManager.currentIsland.currentObject)
 
     def changeAct(self, num):
-        if num == 0:
-            self.updateFromMine(self.game.gameManager.currentIsland.currentObject)
+        self.game.gameManager.changeAct()
+        return
+
 
     def updateFromMine(self, mine):
         self.title = "Mine"

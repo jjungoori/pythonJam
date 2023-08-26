@@ -28,6 +28,7 @@ class Game:
         self.eventHandler = EventHandler(self)
         self.gameManager = GameManager(self)
         self.UIManager = UIManager(self)
+        self.timer = Timer()
 
         self.UIManager.run()
         self.gameManager.run()
