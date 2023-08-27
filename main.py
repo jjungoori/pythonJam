@@ -31,6 +31,9 @@ class Game:
         self.timer = Timer()
 
         self.UIManager.run()
+
+        # self.gameManager.newGame()
+        self.gameManager.loadSave('testGameSave.pkl')
         self.gameManager.run()
 
 

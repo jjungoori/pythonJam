@@ -31,6 +31,28 @@ def rowCenter(img, pos = (0,0)):
 def bottom(img, pos):
     return (pos[0], (SCREEN_HEIGHT-img.get_height()))
 
+def textWrap(text, font, maxWidth):
+    words = text.split(' ')
+    lines = []
+    line = []
+    lineWidth = 0
+    blankWidth = font.size(' ')[0]
+
+    for word in words:
+
+        wordWidth, temp = font.size(word)
+
+        if lineWidth + wordWidth + blankWidth > maxWidth:
+            lines.append(' '.join(line))
+            line = []
+            lineWidth = 0
+
+        line.append(word)
+        lineWidth += wordWidth + blankWidth
+
+    lines.append(' '.join(line))
+    return lines
+
 class Animation:
     def __init__(self, images, img_dur=5, loop=True, start=True):
         self.images = images

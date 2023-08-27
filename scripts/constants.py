@@ -8,3 +8,4 @@ SCREEN_HEIGHT = 700
 
 CAM_LERP_SPEED = 3
 #player speed in main.py 32
+

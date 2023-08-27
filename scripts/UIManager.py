@@ -9,6 +9,9 @@ class UIManager:
         self.game = game
         self.menuIndex = 0
         self.menu = GameMenu(self.game, [])
+
+        self.targetScrollOffset = 0
+        self.scrollOffset = 0
         return
 
     def run(self):
@@ -30,7 +33,7 @@ class UIManager:
         zoomedScreen.blit(ti, colCenter(ti, bottom(ti, (0, 0))) + np.array((-130, -20)))
         ti = rightBtns[self.game.eventHandler.right]
         zoomedScreen.blit(ti, colCenter(ti, bottom(ti, (0, 0))) + np.array((130, -20)))
-        print(self.game.gameManager.action, len(self.actionImages))
+        # print(self.game.gameManager.action, len(self.actionImages))
         self.actionButton.image = self.actionImages[self.game.gameManager.action]
         ti = self.actionButton
         zoomedScreen.blit(ti.image, ti.start)
@@ -68,35 +71,18 @@ class UIManager:
 
             bgPos += np.array((0, 20))
 
-            for i in range(len(menu.items)):
-                menuItem = menu.items[i]
-                # if menuItem.image:
-                #     ti = menuItem.image
-                #     zoomedScreen.blit(ti, bgPos + np.array((20,20 + 80*i)))
-                txt = self.game.assets.middleFont.render(menuItem.title, True, (220, 220, 220))
-                zoomedScreen.blit(txt, bgPos + np.array((40, 20 + 100 * i)))
+            self.scrollOffset += (self.targetScrollOffset - self.scrollOffset) * 0.1
+            scrollViewRect = pygame.Rect(bgPos[0], bgPos[1]+10, 400, 340)
 
-                txt = self.game.assets.font.render(menuItem.description, True, (150, 150, 150))
-                zoomedScreen.blit(txt, bgPos + np.array((40, 50 + 100 * i)))
+            zoomedScreen.set_clip(scrollViewRect)
+            yPosition = scrollViewRect.y + self.scrollOffset
 
-                if menuItem.button != 0:
-                    btnPos = bgPos + np.array((265, 55 + 100 * i))
-                    menuItem.button.pos = np.array(btnPos)
-                    menuItem.button.fixColl()
-                    zoomedScreen.blit(menuItem.button.image, btnPos)
+            for i, item in enumerate(menu.items):
+                itemHeight = item.render(zoomedScreen, (scrollViewRect.x, yPosition))
+                yPosition += itemHeight
 
-                    txt1 = self.game.assets.font.render(str(menuItem.cost[0]), True, (200, 100, 100))
-                    txt1Pos = bgPos + np.array((40, 100 * i + 80))
-                    zoomedScreen.blit(txt1, txt1Pos)
-                    txt2 = self.game.assets.font.render(str(menuItem.cost[1]), True, (100, 100, 200))
-                    txt2Pos = txt1Pos + np.array((txt1.get_width() + 10, 0))
-                    zoomedScreen.blit(txt2, txt2Pos)
-                    txt3 = self.game.assets.font.render(str(menuItem.cost[2]), True, (92, 154, 159))
-                    txt3Pos = txt2Pos + np.array((txt2.get_width() + 10, 0))
-                    zoomedScreen.blit(txt3, txt3Pos)
-                    txt4 = self.game.assets.font.render(str(menuItem.cost[3]), True, (160, 160, 100))
-                    txt4Pos = txt3Pos + np.array((txt3.get_width() + 10, 0))
-                    zoomedScreen.blit(txt4, txt4Pos)
+            zoomedScreen.set_clip(None)
+
     def uiEvent(self):
 
         rt = False
@@ -106,12 +92,12 @@ class UIManager:
             rt = (True, a[1])
 
         for i in self.game.UIManager.menu.items:
-            print("this ca")
+            # print("this ca")
             if i.button == 0:
                 continue
             a = i.button.update()
             if a[0]:
-                print(';;')
+                # print(';;')
                 rt = (True, a[1])
         # if
 
@@ -143,13 +129,56 @@ class ImageButton:
     def up(self):
         self.image = self.images[0]
 
+
 class GameMenuItems:
-    def __init__(self, image, button, title, description):
+    def __init__(self, game, image, button, title, description):
+        self.game = game
         self.image = image
         self.button = button
         self.title = title
         self.description = description
-        self.cost = [0,0,0,0]
+        self.cost = [0, 0, 0, 0]
+
+    def render(self, zoomedScreen, bgPos):
+        txtHeight = 0
+
+        txt = self.game.assets.middleFont.render(self.title, True, (220, 220, 220))
+        zoomedScreen.blit(txt, bgPos + np.array((40, 20)))
+        txtHeight += 40  # Adding height for title
+
+        wrappedDescription = textWrap(self.description, self.game.assets.font, 200)
+        for j, line in enumerate(wrappedDescription):
+            txt = self.game.assets.font.render(line, True, (150, 150, 150))
+            zoomedScreen.blit(txt, bgPos + np.array((40, 50 + j * 20)))
+        txtHeight += (len(wrappedDescription) * 20 + 10)  # Adding height for description
+
+        if self.button != 0:
+            btnPos = bgPos + np.array((265, 55))
+            self.button.pos = np.array(btnPos)
+            self.button.fixColl()
+            zoomedScreen.blit(self.button.image, btnPos)
+
+            txt1 = self.game.assets.font.render(str(self.cost[0]), True, (200, 100, 100))
+            txt1Pos = bgPos + np.array((40, txtHeight + 10))
+            zoomedScreen.blit(txt1, txt1Pos)
+
+            txt2 = self.game.assets.font.render(str(self.cost[1]), True, (100, 100, 200))
+            txt2Pos = txt1Pos + np.array((txt1.get_width() + 10, 0))
+            zoomedScreen.blit(txt2, txt2Pos)
+
+            txt3 = self.game.assets.font.render(str(self.cost[2]), True, (92, 154, 159))
+            txt3Pos = txt2Pos + np.array((txt2.get_width() + 10, 0))
+            zoomedScreen.blit(txt3, txt3Pos)
+
+            txt4 = self.game.assets.font.render(str(self.cost[3]), True, (160, 160, 100))
+            txt4Pos = txt3Pos + np.array((txt3.get_width() + 10, 0))
+            zoomedScreen.blit(txt4, txt4Pos)
+
+            txtHeight += 60  # Adding height for button and cost
+
+        return txtHeight
+
+
 class GameMenu:
     def __init__(self, game, items):
         self.on = False
@@ -161,15 +190,15 @@ class GameMenu:
         self.game.gameManager.currentIsland.upgrades[args[0]] += 1
 
     def temp(self, data, key, i):
-        print("dbg2 : ", data)
-        print(self.game.gameManager.water, data['costs'][key][1])
-        print(self.game.gameManager.fire >= data['costs'][key][0], self.game.gameManager.water >= data['costs'][key][1],
-              self.game.gameManager.air >= data['costs'][key][2],
-              self.game.gameManager.lightening >= data['costs'][key][3])
+        # print("dbg2 : ", data)
+        # print(self.game.gameManager.water, data['costs'][key][1])
+        # print(self.game.gameManager.fire >= data['costs'][key][0], self.game.gameManager.water >= data['costs'][key][1],
+        #       self.game.gameManager.air >= data['costs'][key][2],
+        #       self.game.gameManager.lightening >= data['costs'][key][3])
         if self.game.gameManager.fire >= data['costs'][key][0] and self.game.gameManager.water >= data['costs'][key][
             1] and self.game.gameManager.air >= data['costs'][key][2] and self.game.gameManager.lightening >= \
                 data['costs'][key][3]:
-            print("k")
+            # print("k")
             self.game.gameManager.fire -= data['costs'][key][0]
             self.game.gameManager.water -= data['costs'][key][1]
             self.game.gameManager.air -= data['costs'][key][2]
@@ -190,22 +219,9 @@ class GameMenu:
         ]
         for i in mine.upgrades:
             data = self.game.gameManager.mineUpgrades[i]
-            print("dbg : ", data)
+
             key = mine.upgrades[i]
             temp = partial(self.temp, data, key, i)
-            # def temp():
-            #     print("dbg2 : ", data)
-            #     print(self.game.gameManager.water, data['costs'][key][1])
-            #     print(self.game.gameManager.fire >= data['costs'][key][0], self.game.gameManager.water >= data['costs'][key][1], self.game.gameManager.air >= data['costs'][key][2], self.game.gameManager.lightening >= data['costs'][key][3])
-            #     if self.game.gameManager.fire >= data['costs'][key][0] and self.game.gameManager.water >= data['costs'][key][1] and self.game.gameManager.air >= data['costs'][key][2] and self.game.gameManager.lightening >= data['costs'][key][3]:
-            #         print("k")
-            #         self.game.gameManager.fire -= data['costs'][key][0]
-            #         self.game.gameManager.water -= data['costs'][key][1]
-            #         self.game.gameManager.air -= data['costs'][key][2]
-            #         self.game.gameManager.lightening -= data['costs'][key][3]
-            #
-            #         self.game.gameManager.currentIsland.currentObject.upgrade(i)
-            #         self.updateFromMine(self.game.gameManager.currentIsland.currentObject)
 
             if len(data['costs']) - 1 > key:
                 if self.game.gameManager.fire >= data['costs'][key][0] and self.game.gameManager.water >= data['costs'][key][1] and self.game.gameManager.air >= data['costs'][key][2] and self.game.gameManager.lightening >= data['costs'][key][3]:
@@ -218,7 +234,7 @@ class GameMenu:
             else:
                 btn = 0
 
-            gmi = GameMenuItems(data['image'],
+            gmi = GameMenuItems(self.game, data['image'],
                                             btn, data['title'],
                                             data['descriptions'][key])
             gmi.cost = data['costs'][key]
@@ -231,7 +247,7 @@ class GameMenu:
         ]
         for i in island.upgrades:
             data = self.game.gameManager.mineUpgrades[i]
-            print("dbg : ", data)
+            # print("dbg : ", data)
             key = island.upgrades[i]
             temp = partial(self.temp, data, key, i)
             # def temp():
@@ -259,7 +275,7 @@ class GameMenu:
             else:
                 btn = 0
 
-            gmi = GameMenuItems(data['image'],
+            gmi = GameMenuItems(self.game, data['image'],
                                             btn, data['title'],
                                             data['descriptions'][key])
             gmi.cost = data['costs'][key]

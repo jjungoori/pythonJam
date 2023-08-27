@@ -6,6 +6,7 @@ from scripts.constants import *
 from scripts.utils import *
 from scripts.particle import *
 import csv
+import pickle
 
 
 
@@ -126,14 +127,35 @@ class TileMine(TileObject):
         self.upgrades = upgrades
         self.elements = elements
         self.tiles = np.array([self.elements, self.elements, self.elements])
-        self.readyObject = GameObject(Animation(load_images('entity/spawner'), loop=False, img_dur=4, start = False), tilePosToPos(self.pos))
-        self.readyObject.pos[1] -= 16
         self.game = game
-        self.game.gameManager.objects.append(self.readyObject)
         self.playerOffsetPos = ((-0.25,2), (1.25,2))
         self.prvElement = -1
+        self.readyObject = 0
+
+        # self.load(game)
         print("tilemineSpawned")
         # self.sync()
+
+    def __getstate__(self):
+        state = self.__dict__.copy()
+
+        delState = ['game', 'readyObject', 'targetTilemap']
+        for i in delState:
+            if i in state:
+                del state[i]
+
+        return state
+
+    def load(self, game):
+        self.game = game
+        # self.working = False
+        # self.on = False
+        if self.on == False:
+            self.readyObject = GameObject(Animation(load_images('entity/spawner'), loop=False, img_dur=4, start=False),
+                                          tilePosToPos(self.pos))
+            self.readyObject.pos[1] -= 16
+            self.game.gameManager.objects.append(self.readyObject)
+
 
     def spawnTileObject(self, game):
         game.assets.sounds['mineSpawnStart'].play()
@@ -176,8 +198,7 @@ class TileMine(TileObject):
         self.tiles[0] = np.array([l, r], dtype=int)
 
         self.sync()
-        if self.game.renderer.shake < 0.2:
-            self.game.renderer.shake = 0.2
+        self.game.renderer.shakeScreen(0.2)
         self.game.gameManager.mine(getTiles[lr])
         return getTiles[lr]
 
@@ -186,18 +207,28 @@ class TileMine(TileObject):
             self.upgrades[args[0]] = 0
         self.upgrades[args[0]] += 1
         return
-def getIsland(jsonFile, game):
+
+    def save(self):
+        with open('testMineSave.pkl', 'wb') as file:
+            pickle.dump(self, file)
+
+def getIslandFromJson(jsonFile, game):
     with open(jsonFile, 'r') as file:
         data = json.load(file)
         print('json imported')
         return Island(**data, targetTilemap=game.gameManager.tilemaps['main'], game=game)
 
-def getNewIsland(jsonFile, game): # don't care the tilemines
+def getNewIslandFromJson(jsonFile, game): # don't care the tilemines
     with open(jsonFile, 'r') as file:
         data = json.load(file)
         print('json imported')
         island =  Island(**data, targetTilemap=game.gameManager.tilemaps['main'], game=game)
         island.resetObjects()
+
+def getIslandFromPickle(pickleAdress):
+    with open(pickleAdress, 'rb') as file:
+        island = pickle.load(file)
+    return island
 
 class Island(TileObject):
     def __init__(self, pos, csvStructure, targetTilemap, objs, level, type, start, end, upgrades, game):
@@ -210,9 +241,12 @@ class Island(TileObject):
         self.start = start
         self.end = end
         self.currentObjectIndex = 0
-        self.currentObject = self.objects[self.currentObjectIndex]
         self.upgrades = upgrades
         self.type = type
+
+    def load(self, game):
+        self.game = game
+        self.currentObject = self.objects[self.currentObjectIndex]
 
     def resetObjects(self):
         for i in range(len(self.objects)):
@@ -227,11 +261,25 @@ class Island(TileObject):
         # self.placeOnTilemap()
 
     def upgrade(self, *args):
-        print(args[0])
+        # print(args[0])
         if args[0] not in self.upgrades:
             self.upgrades[args[0]] = 0
         self.upgrades[args[0]] += 1
         return
+
+    def __getstate__(self):
+        state = self.__dict__.copy()
+        delState = ['game', 'currentObject', 'targetTilemap']
+        for i in delState:
+            if i in state:
+                del state[i]
+        return state
+
+    def save(self):
+        with open('testSave.pkl', 'wb') as file:
+            pickle.dump(self, file)
+
+    # def load
 
 
 def getObjectsFromDict(objsDict, game, pos):

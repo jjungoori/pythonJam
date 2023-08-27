@@ -68,4 +68,7 @@ class Renderer:
         self.screen.blit(zoomedScreen, (0, 0))
         pygame.display.update()
 
+    def shakeScreen(self, intensity):
+        if intensity > self.shake:
+            self.shake = intensity
 

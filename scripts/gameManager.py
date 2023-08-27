@@ -37,6 +37,7 @@ class GameManager:
         self.islands = [
         ]
 
+        self.currentIsland = None
         self.currentIslandIndex = 0
 
 
@@ -52,26 +53,6 @@ class GameManager:
             self.upgradeChances[i] = chanceGen
         self.maxChance = chanceGen
 
-        # self.game.UIManager.menus = [
-        #     Menu(self.game, [
-        #         MenuItems(None,
-        #                   ImageButton([game.assets['ui/smallBtn.png'], game.assets['ui/smallBtnPressed.png']],
-        #                               (0, 0), self.game.gameManager.currentIsland.upgrade, 'add'), 'island', 'add 1 combo per click'),
-        #     ]),
-            # Menu(self.game, [
-            #     MenuItems(None,
-            #               ImageButton([game.assets['ui/smallBtn.png'], game.assets['ui/smallBtnPressed.png']],
-            #                           (0, 0), self.game.gameManager.currentIsland.currentObject.upgrade, 'add'), 'mine',
-            #               'add 2 combo per click'),
-            # ]),
-            # Menu(self.game, [
-            #     MenuItems(None,
-            #               ImageButton([game.assets['ui/smallBtn.png'], game.assets['ui/smallBtnPressed.png']],
-            #                           (0, 0), self.game.gameManager.currentIsland.currentObject.upgrade, 'add'), 'new',
-            #               'add 1 combo per click'),
-            # ]),
-        # ]
-
         #for mines
         self.combo = 0
         self.prvElement = -1
@@ -84,14 +65,40 @@ class GameManager:
         self.lightening = 0
         self.air = 0
 
+    def newGame(self):
+
+        self.tilemaps['main'].loadFromCsv('map/firstIsland.csv')
+        self.islands = [
+            getIslandFromJson('resources/map/basicIsland.json', self.game),
+            getIslandFromJson('resources/map/secondIsland.json', self.game)
+        ]
+
+    def loadSave(self, saveFilePath):
+        with open(saveFilePath, 'rb') as file:
+            save = pickle.load(file)
+        self.islands, self.fire, self.water, self.air, self.lightening, self.combo, self.prvElement = save.islands, save.fire, save.water, save.air, save.lightening, save.combo, save.prvElement
+
+    def save(self):
+        gameSave = GameSave(self.islands, self.fire, self.water,
+                            self.air, self.lightening, self.combo, self.prvElement)
+        with open('testGameSave.pkl', 'wb') as file:
+            pickle.dump(gameSave, file)
 
     def load(self):
-        # self.tilemaps['main'].loadFromCsv('map/firstIsland.csv')
-        self.islands = [
-            getIsland('resources/map/basicIsland.json', self.game),
-            getIsland('resources/map/secondIsland.json', self.game)
-        ]
-        self.currentIsland = self.islands[0]
+
+        for i in self.islands:
+            i.targetTilemap = self.tilemaps['main']
+            i.load(self.game)
+            for l in i.objects:
+                l.targetTilemap = self.tilemaps['object']
+                l.load(self.game)
+
+        self.currentIsland = self.islands[self.currentIslandIndex]
+
+        self.game.gameManager.currentIsland.sync()
+        targetObject = self.game.gameManager.currentIsland.currentObject
+        self.game.gameManager.player[0].pos = np.array(
+            tilePosToPos(targetObject.pos + np.array(targetObject.playerOffsetPos[0], dtype=float)))
 
         for i in self.tileObjects:
             i.loadStructureFromCsv()
@@ -143,9 +150,12 @@ class GameManager:
     def act(self, *args):
 
         if self.action == 0:
+            print("okay")
             targetObject = self.game.gameManager.currentIsland.currentObject
             if type(targetObject) == TileMine:
+                print("then")
                 if not targetObject.on:
+                    print("yay")
                     if not targetObject.working:
                         targetObject.working = True
                         targetObject.spawnTileObject(self.game)
@@ -187,10 +197,7 @@ class GameManager:
                 if self.game.UIManager.menuIndex > 2:
                     self.game.UIManager.menuIndex = 0
                 # self.game.UIManager.menu = self.game.UIManager.menus[self.game.UIManager.menuIndex]
-                if self.game.UIManager.menuIndex == 0:
-                    self.game.UIManager.menu.updateFromMine(self.game.gameManager.currentIsland.currentObject)
-                elif self.game.UIManager.menuIndex == 1:
-                    self.game.UIManager.menu.updateFromIsland(self.game.gameManager.currentIsland)
+                self.updateMenu()
 
                 # self.game.UIManager.menu.on = True
             else:
@@ -198,10 +205,7 @@ class GameManager:
                 if self.game.UIManager.menuIndex < 0:
                     self.game.UIManager.menuIndex = 2
                 # self.game.UIManager.menu = self.game.UIManager.menus[self.game.UIManager.menuIndex]
-                if self.game.UIManager.menuIndex == 0:
-                    self.game.UIManager.menu.updateFromMine(self.game.gameManager.currentIsland.currentObject)
-                elif self.game.UIManager.menuIndex == 1:
-                    self.game.UIManager.menu.updateFromIsland(self.game.gameManager.currentIsland)
+                self.updateMenu()
 
     def mine(self, element):
         if self.prvElement == element:
@@ -235,7 +239,7 @@ class GameManager:
             elif self.prvElement == 3:
                 self.lightening += addEle
 
-            self.game.renderer.shake = min(self.combo/10, 300)
+            self.game.renderer.shakeScreen(min(self.combo/10, 300))
             self.combo = 0
         self.prvElement = element
         return
@@ -245,6 +249,7 @@ class GameManager:
         self.game.assets.sounds['change'].play()
         self.action += 1
         if self.action == 2:
+            self.updateMenu()
             self.game.UIManager.menu.on = True
         else:
             self.game.UIManager.menu.on = False
@@ -281,3 +286,17 @@ class GameManager:
     #     gmi.cost = data['costs'][key]
     #     self.items.append(gmi)
 
+    def updateMenu(self):
+        if self.game.UIManager.menuIndex == 0:
+            self.game.UIManager.menu.updateFromMine(self.game.gameManager.currentIsland.currentObject)
+        elif self.game.UIManager.menuIndex == 1:
+            self.game.UIManager.menu.updateFromIsland(self.game.gameManager.currentIsland)
+class GameSave:
+    def __init__(self, islands, fire, water, air, lightening, combo, prvElement):
+        self.islands = islands
+        self.fire = fire
+        self.water = water
+        self.air = air
+        self.lightening = lightening
+        self.combo = combo
+        self.prvElement = prvElement
