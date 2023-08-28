@@ -1,11 +1,7 @@
 import random
 import json
-import pygame
-import numpy as np
-from scripts.constants import *
 from scripts.utils import *
 from scripts.particle import *
-import csv
 import pickle
 
 

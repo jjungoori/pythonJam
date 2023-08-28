@@ -1,6 +1,4 @@
-import  pygame
 from scripts.objects import *
-import  numpy as np
 from scripts.utils import *
 import json
 from scripts.tiles import *
@@ -210,7 +208,7 @@ class GameManager:
     def mine(self, element):
         if self.prvElement == element:
             #calc added feature
-            addedCombo = 10000
+            addedCombo = 1 # comboValue
             if 'add' in self.game.gameManager.currentIsland.currentObject.upgrades:
                 addedCombo += self.mineUpgrades['add']['values'][self.game.gameManager.currentIsland.currentObject.upgrades['add']]
 

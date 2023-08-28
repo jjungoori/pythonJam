@@ -1,6 +1,4 @@
-import pygame
 import sys
-from scripts.constants import *
 from scripts.gameManager import *
 
 class EventHandler:

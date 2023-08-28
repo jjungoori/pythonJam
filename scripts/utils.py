@@ -1,5 +1,4 @@
 import os
-import csv
 import pygame
 from scripts.constants import *
 

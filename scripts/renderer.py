@@ -1,7 +1,5 @@
 import random
 import numpy as np
-import pygame
-from scripts.constants import *
 from scripts.utils import *
 
 
