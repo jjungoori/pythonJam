@@ -19,8 +19,8 @@ class Game:
 
         self.UIManager.run()
 
-        self.gameManager.newGame()
-        # self.gameManager.loadSave('testGameSave.pkl')
+        # self.gameManager.newGame()
+        self.gameManager.loadSave('testGameSave.pkl')
         self.gameManager.run()
 
 

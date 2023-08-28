@@ -52,7 +52,8 @@ class TileObject:
         self.run()
 
     def run(self):
-        self.loadStructureFromCsv()
+        if self.csvStructure:
+            self.loadStructureFromCsv()
 
     def loadStructureFromCsv(self):
         rows = []
@@ -208,18 +209,18 @@ class TileMine(TileObject):
         with open('testMineSave.pkl', 'wb') as file:
             pickle.dump(self, file)
 
-def getIslandFromJson(jsonFile, game):
-    with open(jsonFile, 'r') as file:
-        data = json.load(file)
-        print('json imported')
-        return Island(**data, targetTilemap=game.gameManager.tilemaps['main'], game=game)
-
-def getNewIslandFromJson(jsonFile, game): # don't care the tilemines
-    with open(jsonFile, 'r') as file:
-        data = json.load(file)
-        print('json imported')
-        island =  Island(**data, targetTilemap=game.gameManager.tilemaps['main'], game=game)
-        island.resetObjects()
+# def getIslandFromJson(jsonFile, game):
+#     with open(jsonFile, 'r') as file:
+#         data = json.load(file)
+#         print('json imported')
+#         return Island(**data, targetTilemap=game.gameManager.tilemaps['main'], game=game)
+#
+# def getNewIslandFromJson(jsonFile, game): # don't care the tilemines
+#     with open(jsonFile, 'r') as file:
+#         data = json.load(file)
+#         print('json imported')
+#         island =  Island(**data, targetTilemap=game.gameManager.tilemaps['main'], game=game)
+#         island.resetObjects()
 
 def getIslandFromPickle(pickleAdress):
     with open(pickleAdress, 'rb') as file:
@@ -227,18 +228,55 @@ def getIslandFromPickle(pickleAdress):
     return island
 
 class Island(TileObject):
-    def __init__(self, pos, csvStructure, targetTilemap, objs, level, type, start, end, upgrades, game):
-        self.objects = objs
+    def __init__(self, pos, csvStructure, targetTilemap, game):
+        self.objects = {}
         self.game = game
 
         super().__init__(pos, targetTilemap, csvStructure)
         self.type = 'whiteLand'
-        self.level = level
-        self.start = start
-        self.end = end
+        self.level = 0
+        self.start = 0
+        self.end = 0
         self.currentObjectIndex = 0
-        self.upgrades = upgrades
+        self.upgrades = {}
         self.type = type
+        self.foundNew = False
+
+        self.pre()
+
+    def pre(self):
+        print("island innit")
+        self.objects['tilemines'] = []
+        print(self.structure)
+        for y in range(len(self.structure)):
+            for x in range(len(self.structure[0])):
+
+                if self.structure[y][x] == START:
+                    self.structure[y][x] = -1
+                    self.start = (x, y)
+                elif self.structure[y][x] == END:
+                    self.structure[y][x] = -1
+                    self.end = (x, y)
+
+                elif self.structure[y][x] == 63:
+                    print("1 1 1")
+                    self.structure[y][x] = 134
+                    self.objects['tilemines'].append(['resources/map/basicTileMine.json', (x, y)])
+
+                elif self.structure[y][x] == 61:
+                    print("2 2 2")
+                    self.structure[y][x] = -1
+                    self.objects['tilemines'].append(['resources/map/basicTileMine.json', (x, y)])
+
+        print("my struct : ", self.structure)
+        # self.placeOnTilemap()
+
+
+        print("omg : ", self.objects)
+        self.objects = getObjectsFromDict(self.objects, self.game, self.pos)
+        print("this : ", self.objects)
+        self.resetObjects()
+        print("donenene")
 
     def load(self, game):
         self.game = game
@@ -250,11 +288,6 @@ class Island(TileObject):
 
     def sync(self):
         self.currentObject = self.objects[self.currentObjectIndex]
-    def run(self):
-        # print("B")
-        self.objects = getObjectsFromDict(self.objects, self.game, self.pos)
-        # self.loadStructureFromCsv()
-        # self.placeOnTilemap()
 
     def upgrade(self, *args):
         # print(args[0])
@@ -284,7 +317,7 @@ def getObjectsFromDict(objsDict, game, pos):
         # print(i)
         if i == "tilemines":
             for l in objsDict[i]:
-                # print(l)
+                print(l)
                 temp = getTileMine(l[0], pos + np.array(l[1]), game=game)
                 # temp = getRandomTileMine(pos + np.array(l[1]), game = game)
                 objs.append(temp)

@@ -63,22 +63,26 @@ class GameManager:
         self.lightening = 0
         self.air = 0
 
+        self.level = 0
+
     def newGame(self):
 
-        self.tilemaps['main'].loadFromCsv('map/firstIsland.csv')
+        # self.tilemaps['main'].loadFromCsv('map/firstIsland.csv')
         self.islands = [
-            getIslandFromJson('resources/map/basicIsland.json', self.game),
-            getIslandFromJson('resources/map/secondIsland.json', self.game)
+            Island((0,0), "resources/map/7.csv", self.tilemaps["main"], self.game),
+            Island((0, 7), "resources/map/8.csv", self.tilemaps["main"], self.game)
+            # getIslandFromJson('resources/map/basicIsland.json', self.game),
+            # getIslandFromJson('resources/map/secondIsland.json', self.game)
         ]
 
     def loadSave(self, saveFilePath):
         with open(saveFilePath, 'rb') as file:
             save = pickle.load(file)
-        self.islands, self.fire, self.water, self.air, self.lightening, self.combo, self.prvElement = save.islands, save.fire, save.water, save.air, save.lightening, save.combo, save.prvElement
+        self.islands, self.fire, self.water, self.air, self.lightening, self.combo, self.prvElement,self.currentIslandIndex, self.level = save.islands, save.fire, save.water, save.air, save.lightening, save.combo, save.prvElement, save.currentIslandIndex, save.level
 
     def save(self):
         gameSave = GameSave(self.islands, self.fire, self.water,
-                            self.air, self.lightening, self.combo, self.prvElement)
+                            self.air, self.lightening, self.combo, self.prvElement, self.currentIslandIndex, self.level)
         with open('testGameSave.pkl', 'wb') as file:
             pickle.dump(gameSave, file)
 
@@ -103,7 +107,7 @@ class GameManager:
             i.placeOnTilemap()
 
         for i in self.islands:
-            i.loadStructureFromCsv()
+            # i.loadStructureFromCsv()
             i.placeOnTilemap()
             for l in i.objects:
                 l.placeOnTilemap()
@@ -208,7 +212,7 @@ class GameManager:
     def mine(self, element):
         if self.prvElement == element:
             #calc added feature
-            addedCombo = 1 # comboValue
+            addedCombo = 1000 # comboValue
             if 'add' in self.game.gameManager.currentIsland.currentObject.upgrades:
                 addedCombo += self.mineUpgrades['add']['values'][self.game.gameManager.currentIsland.currentObject.upgrades['add']]
 
@@ -289,8 +293,10 @@ class GameManager:
             self.game.UIManager.menu.updateFromMine(self.game.gameManager.currentIsland.currentObject)
         elif self.game.UIManager.menuIndex == 1:
             self.game.UIManager.menu.updateFromIsland(self.game.gameManager.currentIsland)
+        elif self.game.UIManager.menuIndex == 2:
+            self.game.UIManager.menu.updateFromNew(self.game.gameManager.currentIsland)
 class GameSave:
-    def __init__(self, islands, fire, water, air, lightening, combo, prvElement):
+    def __init__(self, islands, fire, water, air, lightening, combo, prvElement, currentIslandIndex, level):
         self.islands = islands
         self.fire = fire
         self.water = water
@@ -298,3 +304,5 @@ class GameSave:
         self.lightening = lightening
         self.combo = combo
         self.prvElement = prvElement
+        self.currentIslandIndex = currentIslandIndex
+        self.level = level

@@ -42,7 +42,7 @@ class EventHandler:
                     i()
                 self.up()
             elif event.type == pygame.KEYDOWN:
-                if event.key == pygame.K_SPACE:
+                if event.key == pygame.K_SPACE or event.key == pygame.K_DOWN:
                     self.game.gameManager.changeAct()
                 if event.key == pygame.K_LEFT:
                     # self.game.gameManager.movement[0] = True
@@ -50,12 +50,7 @@ class EventHandler:
                 elif event.key == pygame.K_RIGHT:
                     # self.game.gameManager.movement[1] = True
                     self.rightC()
-                elif event.key == pygame.K_UP:
-                    self.game.gameManager.movement[2] = True
-                    pass
-                elif event.key == pygame.K_DOWN:
-                    self.game.gameManager.movement[3] = True
-                    pass
+
             elif event.type == pygame.KEYUP:
                 if event.key == pygame.K_LEFT:
                     self.up()

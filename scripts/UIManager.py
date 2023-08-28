@@ -189,7 +189,7 @@ class GameMenu:
     def upgrade(self, *args):
         self.game.gameManager.currentIsland.upgrades[args[0]] += 1
 
-    def temp(self, data, key, i):
+    def tempMine(self, data, key, i):
         # print("dbg2 : ", data)
         # print(self.game.gameManager.water, data['costs'][key][1])
         # print(self.game.gameManager.fire >= data['costs'][key][0], self.game.gameManager.water >= data['costs'][key][1],
@@ -207,6 +207,39 @@ class GameMenu:
             self.game.gameManager.currentIsland.currentObject.upgrade(i)
             self.updateFromMine(self.game.gameManager.currentIsland.currentObject)
 
+    def tempIsland(self, data, key, i):
+        # print("dbg2 : ", data)
+        # print(self.game.gameManager.water, data['costs'][key][1])
+        # print(self.game.gameManager.fire >= data['costs'][key][0], self.game.gameManager.water >= data['costs'][key][1],
+        #       self.game.gameManager.air >= data['costs'][key][2],
+        #       self.game.gameManager.lightening >= data['costs'][key][3])
+        if self.game.gameManager.fire >= data['costs'][key][0] and self.game.gameManager.water >= data['costs'][key][
+            1] and self.game.gameManager.air >= data['costs'][key][2] and self.game.gameManager.lightening >= \
+                data['costs'][key][3]:
+            # print("k")
+            self.game.gameManager.fire -= data['costs'][key][0]
+            self.game.gameManager.water -= data['costs'][key][1]
+            self.game.gameManager.air -= data['costs'][key][2]
+            self.game.gameManager.lightening -= data['costs'][key][3]
+
+            self.game.gameManager.currentIsland.upgrade(i)
+            self.updateFromIsland(self.game.gameManager.currentIsland)
+
+    def tempNewIsland(self, cost, island):
+        print("hhhh")
+        if self.game.gameManager.fire >= cost[0] and self.game.gameManager.water >= cost[
+            1] and self.game.gameManager.air >= cost[2] and self.game.gameManager.lightening >= cost[3]:
+            print("ggggg")
+
+            island.foundNew = True
+
+            self.game.gameManager.fire -= cost[0]
+            self.game.gameManager.water -= cost[1]
+            self.game.gameManager.air -= cost[2]
+            self.game.gameManager.lightening -= cost[3]
+
+            self.updateFromNew(island)
+
     def changeAct(self, num):
         self.game.gameManager.changeAct()
         return
@@ -221,7 +254,7 @@ class GameMenu:
             data = self.game.gameManager.mineUpgrades[i]
 
             key = mine.upgrades[i]
-            temp = partial(self.temp, data, key, i)
+            temp = partial(self.tempMine, data, key, i)
 
             if len(data['costs']) - 1 > key:
                 if self.game.gameManager.fire >= data['costs'][key][0] and self.game.gameManager.water >= data['costs'][key][1] and self.game.gameManager.air >= data['costs'][key][2] and self.game.gameManager.lightening >= data['costs'][key][3]:
@@ -249,7 +282,7 @@ class GameMenu:
             data = self.game.gameManager.mineUpgrades[i]
             # print("dbg : ", data)
             key = island.upgrades[i]
-            temp = partial(self.temp, data, key, i)
+            temp = partial(self.tempIsland, data, key, i)
             # def temp():
             #     print("dbg2 : ", data)
             #     print(self.game.gameManager.water, data['costs'][key][1])
@@ -280,3 +313,34 @@ class GameMenu:
                                             data['descriptions'][key])
             gmi.cost = data['costs'][key]
             self.items.append(gmi)
+
+    def updateFromNew(self, island):
+        self.title = "New Island"
+        self.items = [
+
+        ]
+
+        cost = [*map(lambda x : x * max(1, self.game.gameManager.level - len(ISLAND_COST) + 1), ISLAND_COST[min(self.game.gameManager.level, len(ISLAND_COST)-1)])]
+
+        temp = partial(self.tempNewIsland, cost, island)
+
+        if not island.foundNew:
+            if self.game.gameManager.fire >= cost[0] and self.game.gameManager.water >= \
+                    cost[1] and self.game.gameManager.air >= cost[
+                2] and self.game.gameManager.lightening >= cost[3]:
+                btn = ImageButton(
+                    [self.game.assets.images['ui/smallBtn.png'], self.game.assets.images['ui/smallBtnPressed.png']],
+                    (0, 0), temp)
+            else:
+                btn = ImageButton([self.game.assets.images['ui/smallBtnPressed.png'],
+                                   self.game.assets.images['ui/smallBtnPressed.png']],
+                                  (0, 0), temp)
+
+        else:
+            btn = 0
+
+        gmi = GameMenuItems(self.game, None,
+                            btn, "New Island",
+                            "Get the new random island!")
+        gmi.cost = cost
+        self.items.append(gmi)

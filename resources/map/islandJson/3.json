@@ -1,0 +1,17 @@
+{
+  "pos" : [0,0],
+  "csvStructure" : "resources/map/3.csv",
+  "objs" : {
+    "tilemines"  : [
+      ["resources/map/basicTileMine.json", [2,0]],
+      ["resources/map/basicTileMine.json", [7,3]]
+    ]
+  },
+  "level": 1,
+  "type": 0,
+  "start": [0, 0],
+  "end": [10, 9],
+  "upgrades": {
+    "add" : 0
+  }
+}
