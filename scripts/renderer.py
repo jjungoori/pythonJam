@@ -12,10 +12,18 @@ class Renderer:
         self.display = pygame.Surface((SCREEN_WIDTH, SCREEN_HEIGHT))
         self.shake = 10
         self.game = game
+        # self.targetPos = self.game.gameManager.player.pos
+        self.camTarget = 0 # 0 : player, 1 : free
 
     def render(self, dt):
         # self.screen.fill((0, 0, 0, 0))
         self.display.fill((201, 225, 229, 255))
+
+        if self.camTarget == 0:
+            self.targetPos = self.game.gameManager.player[0].pos
+
+        # elif self.camTarget == 1:
+        #     self.targetPos =
 
         # for i in self.game.gameManager.objects:
         #     i.update()
@@ -26,7 +34,7 @@ class Renderer:
         # self.screen.blit(self.display, (0, 0))
 
         self.game.gameManager.zoomFactor = (1 - CAM_LERP_SPEED * dt) * self.game.gameManager.zoomFactor + CAM_LERP_SPEED * dt * self.targetZoom
-        self.game.gameManager.camPos = (1 - CAM_LERP_SPEED * dt) * self.game.gameManager.camPos + CAM_LERP_SPEED * dt * (self.game.gameManager.player[0].pos + np.array((0,5)))
+        self.game.gameManager.camPos = (1 - CAM_LERP_SPEED * dt) * self.game.gameManager.camPos + CAM_LERP_SPEED * dt * (self.targetPos + np.array((0,5)))
 
         self.game.gameManager.viewport.left = self.game.gameManager.camPos[1] - (SCREEN_HEIGHT / self.game.gameManager.zoomFactor) / 2 + TILE_SIZE / 2
         self.game.gameManager.viewport.top = self.game.gameManager.camPos[0] - (SCREEN_WIDTH / self.game.gameManager.zoomFactor) / 2 + TILE_SIZE / 2

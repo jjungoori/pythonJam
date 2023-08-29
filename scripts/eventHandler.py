@@ -1,4 +1,7 @@
 import sys
+
+import pygame
+
 from scripts.gameManager import *
 
 class EventHandler:
@@ -16,6 +19,9 @@ class EventHandler:
     def update(self):
 
         for event in pygame.event.get():
+
+            if event.type == pygame.MOUSEWHEEL:
+                continue
 
             if event.type == pygame.QUIT:
                 pygame.quit()

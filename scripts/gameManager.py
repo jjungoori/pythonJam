@@ -300,8 +300,19 @@ class GameManager:
 
     def spawnNewIsland(self):
         print(self.currentIsland.end)
+
         a = random.randint(-1, 3)
         b = 3 - a
+
+        self.game.renderer.shakeScreen(100)
+        self.game.renderer.targetPos = tilePosToPos(self.currentIsland.pos + np.array(self.currentIsland.end) + np.array((a + 3, b + 3)))
+        self.game.renderer.camTarget = 1
+
+        def temp():
+            self.game.renderer.camTarget = 0
+
+        self.game.timer.add(2000, temp)
+
         self.islands.append(
             Island(self.currentIsland.pos + np.array(self.currentIsland.end) + np.array((a, b)), "resources/map/" + str(random.randint(2, 8)) + ".csv", self.tilemaps['main'], self.game))
 
