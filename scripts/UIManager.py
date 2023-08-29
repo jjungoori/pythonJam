@@ -232,6 +232,7 @@ class GameMenu:
             print("ggggg")
 
             island.foundNew = True
+            self.game.gameManager.level += 1
 
             self.game.gameManager.fire -= cost[0]
             self.game.gameManager.water -= cost[1]
@@ -239,6 +240,9 @@ class GameMenu:
             self.game.gameManager.lightening -= cost[3]
 
             self.updateFromNew(island)
+
+            self.changeAct(2)
+            self.game.timer.add(1, self.game.gameManager.spawnNewIsland)
 
     def changeAct(self, num):
         self.game.gameManager.changeAct()
@@ -324,6 +328,8 @@ class GameMenu:
 
         temp = partial(self.tempNewIsland, cost, island)
 
+        des = "Get the new random island!"
+
         if not island.foundNew:
             if self.game.gameManager.fire >= cost[0] and self.game.gameManager.water >= \
                     cost[1] and self.game.gameManager.air >= cost[
@@ -338,9 +344,10 @@ class GameMenu:
 
         else:
             btn = 0
+            des = "OWO"
 
         gmi = GameMenuItems(self.game, None,
                             btn, "New Island",
-                            "Get the new random island!")
+                            des)
         gmi.cost = cost
         self.items.append(gmi)

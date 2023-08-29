@@ -1,3 +1,5 @@
+import random
+
 from scripts.objects import *
 from scripts.utils import *
 import json
@@ -93,7 +95,7 @@ class GameManager:
             i.load(self.game)
             for l in i.objects:
                 l.targetTilemap = self.tilemaps['object']
-                l.load(self.game)
+                # l.load(self.game)
 
         self.currentIsland = self.islands[self.currentIslandIndex]
 
@@ -295,6 +297,14 @@ class GameManager:
             self.game.UIManager.menu.updateFromIsland(self.game.gameManager.currentIsland)
         elif self.game.UIManager.menuIndex == 2:
             self.game.UIManager.menu.updateFromNew(self.game.gameManager.currentIsland)
+
+    def spawnNewIsland(self):
+        print(self.currentIsland.end)
+        a = random.randint(-1, 3)
+        b = 3 - a
+        self.islands.append(
+            Island(self.currentIsland.pos + np.array(self.currentIsland.end) + np.array((a, b)), "resources/map/" + str(random.randint(2, 8)) + ".csv", self.tilemaps['main'], self.game))
+
 class GameSave:
     def __init__(self, islands, fire, water, air, lightening, combo, prvElement, currentIslandIndex, level):
         self.islands = islands

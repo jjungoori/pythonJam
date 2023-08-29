@@ -278,8 +278,22 @@ class Island(TileObject):
         self.resetObjects()
         print("donenene")
 
+        self.currentObject = self.objects[self.currentObjectIndex]
+        print(self.currentObject)
+        self.placeOnTilemap()
+
+
+
+        for i in self.objects:
+            i.load(self.game)
+            i.targetTilemap = self.game.gameManager.tilemaps['object']
+            # l.load(self.game)
+
     def load(self, game):
         self.game = game
+        for i in self.objects:
+            i.load(self.game)
+
         self.currentObject = self.objects[self.currentObjectIndex]
 
     def resetObjects(self):

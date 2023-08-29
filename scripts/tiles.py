@@ -47,10 +47,10 @@ class StaticTilemap:
 
     def render(self, screen, viewport, chunkSize=(10, 10), distance=3):
 
-        startChunkX = viewport.left // (chunkSize[0] * TILE_SIZE) - distance
-        endChunkX = ((viewport.left + SCREEN_WIDTH) // (chunkSize[0] * TILE_SIZE)) + 1 + distance
-        startChunkY = viewport.top // (chunkSize[1] * TILE_SIZE) - distance
-        endChunkY = ((viewport.top + SCREEN_HEIGHT) // (chunkSize[1] * TILE_SIZE)) + 1 + distance
+        startChunkX = viewport.top // (chunkSize[0] * TILE_SIZE) - distance
+        endChunkX = ((viewport.top + SCREEN_WIDTH) // (chunkSize[0] * TILE_SIZE)) + 1 + distance
+        startChunkY = viewport.left // (chunkSize[1] * TILE_SIZE) - distance
+        endChunkY = ((viewport.left + SCREEN_HEIGHT) // (chunkSize[1] * TILE_SIZE)) + 1 + distance
 
         for chunkX in range(startChunkX, endChunkX):
             for chunkY in range(startChunkY, endChunkY):
