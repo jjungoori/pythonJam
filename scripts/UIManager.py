@@ -1,6 +1,7 @@
 from scripts.utils import *
 import numpy as np
 from functools import partial
+from scripts.dialogManager import *
 
 class UIManager:
     def __init__(self, game):
@@ -9,6 +10,8 @@ class UIManager:
         self.game = game
         self.menuIndex = 0
         self.menu = GameMenu(self.game, [])
+        self.dialog = Dialog(self.game)
+        self.dialogManager = DialogManager(self.game)
 
         self.targetScrollOffset = 0
         self.scrollOffset = 0
@@ -82,6 +85,8 @@ class UIManager:
                 yPosition += itemHeight
 
             zoomedScreen.set_clip(None)
+
+        self.dialog.render(zoomedScreen)
 
     def uiEvent(self):
 
@@ -351,3 +356,48 @@ class GameMenu:
                             des)
         gmi.cost = cost
         self.items.append(gmi)
+
+
+class Dialog:
+    def __init__(self, game):
+        self.game = game
+        self.bg = self.game.assets.images['ui/dialog.png']
+        self.text = ""
+        self.wrappedText = textWrap("", self.game.assets.font, self.bg.get_width() - 50)
+        self.bgPos = colCenter(self.bg, bottom(self.bg, (0, 0))) - np.array((0, 200))
+        self.on = False
+
+    def setText(self, text):
+        self.text = text
+        self.wrappedText = textWrap(text, self.game.assets.font, self.bg.get_width() - 50)
+
+    def render(self, surf):
+        if not self.on:
+            return
+        surf.blit(self.bg, self.bgPos)
+        bgPos = self.bgPos + np.array((30, 25))
+
+        for i, text in enumerate(self.wrappedText):
+            textRender = self.game.assets.font.render(text, True, (200, 200, 200))
+            surf.blit(textRender, bgPos + np.array((0, 20 * i)))
+    def print(self, text):
+        self.game.UITimer.timers.clear()
+        self.setText(text)
+    def say(self, text, delayTime):
+        self.setText("")
+
+        fullText = textWrap(text, self.game.assets.font, self.bg.get_width() - 50)
+        count = 0
+
+        for i, line in enumerate(fullText):
+            for j, char in enumerate(line):
+                self.game.UITimer.add(count * delayTime, lambda char=char: self.addChar(char))
+                count += 1
+
+            self.game.UITimer.add(count * delayTime, lambda: self.addChar(" "))
+            count += 1
+
+
+    def addChar(self, char):
+        self.text += char
+        self.wrappedText = textWrap(self.text, self.game.assets.font, self.bg.get_width() - 50)

@@ -20,7 +20,8 @@ class Assets:
             'ui/move.png': 0,
             'ui/UIBG.png': 0,
             'ui/smallBtn.png': 0,
-            'ui/smallBtnPressed.png': 0
+            'ui/smallBtnPressed.png': 0,
+            'ui/dialog.png' : 0
             # 'ui/upgradeAdd' : 1
         }
         self.imagePreprocess()

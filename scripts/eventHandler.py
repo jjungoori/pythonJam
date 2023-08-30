@@ -79,7 +79,8 @@ class EventHandler:
 
                     # targetZoom += 0.5
                 elif event.key == pygame.K_w:
-                    pass
+                    print("K")
+                    self.game.UIManager.dialogManager.next()
 
             if self.dragging:
                 self.game.UIManager.targetScrollOffset = min(0, (pygame.mouse.get_pos()[1] - self.dragStartPos))

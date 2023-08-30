@@ -4,6 +4,9 @@ from scripts.gameManager import *
 from scripts.assets import *
 from scripts.UIManager import *
 
+import os.path
+from os import path
+
 
 
 class Game:
@@ -16,11 +19,15 @@ class Game:
         self.gameManager = GameManager(self)
         self.UIManager = UIManager(self)
         self.timer = Timer()
+        self.UITimer = Timer()
 
         self.UIManager.run()
 
-        # self.gameManager.newGame()
-        self.gameManager.loadSave('testGameSave.pkl')
+        if path.exists('save.pkl'):
+            self.gameManager.loadSave('save.pkl')
+        else:
+            self.gameManager.newGame()
+
         self.gameManager.run()
 
 

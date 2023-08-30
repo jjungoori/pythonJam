@@ -71,21 +71,46 @@ class GameManager:
 
         # self.tilemaps['main'].loadFromCsv('map/firstIsland.csv')
         self.islands = [
-            Island((0,0), "resources/map/7.csv", self.tilemaps["main"], self.game),
-            Island((0, 7), "resources/map/8.csv", self.tilemaps["main"], self.game)
+            Island((0,0), "resources/map/4.csv", self.tilemaps["main"], self.game),
+            # Island((0, 7), "resources/map/8.csv", self.tilemaps["main"], self.game)
             # getIslandFromJson('resources/map/basicIsland.json', self.game),
             # getIslandFromJson('resources/map/secondIsland.json', self.game)
         ]
+
+        self.game.UIManager.dialogManager.setDialog("""튜토리얼 / 예상 소요시간 : 1 ~ 2분 / *터치*
+        이 게임은 자원을 모아 채광기를 업그레이드 하고, 새로운 섬을 개척해 나가는 게임입니다.
+        가운데 보이는 곡괭이 모양의 버튼은 현재 플레이어가 채집 상태임을 말합니다.
+        이 상태에서는 화면의 좌우를 터치하여 자원을 채집할 수 있습니다.
+        자원의 채집은 같은 색깔의 원소 타일 방향의 화면을 누르는 것으로 가능합니다.
+        이제 가운데 보이는 곡괭이 모양의 버튼을 눌러보십시오.
+        가운데 버튼이 신발 모양으로 바뀝니다.
+        이 상태에서는 화면의 좌우를 터치하여 섬 또는 채집지 간의 이동이 가능합니다.
+        현재 상태에서는 이동할 대상이 없어 이동이 불가할 겁니다.
+        각각의 섬과 채집지는 각각의 특성을 가지고 있어, 이동 기능을 잘 사용하는 것이 중요합니다.
+        다시 한번 가운데 버튼을 눌러보세요.
+        이번에는 위에 화살표 모양이 보일겁니다.
+        이 상태에서는 자동으로 업그레이드 메뉴가 뜨며, 화면의 좌우를 터치하여 메뉴를 전환할 수 있습니다.
+        각각의 메뉴에서는 현재 플레이어가 있는 섬 또는 채집지에 대한 업그레이드가 가능합니다.
+        화면 좌측 상단에 있는 사색의 숫자들이 플레이어가 가지고 있는 자원, 원소들의 양이며, 업그레이드에는 이 원소들이 소비됩니다.
+        또한 New Island라는 제목을 가진 메뉴에서는 새로운 섬을 개척할 수 있습니다.
+        새로운 섬을 개척하는 것이 이 게임의 궁극적인 목표이자, 이를 통해 플레이어는 더욱 많은 자원을 얻을 수 있습니다.
+        한 번 더 가운데 위치한 버튼을 눌러보면 버튼이 다시 곡괭이 모양이 된 것을 볼 수 있습니다.
+        곡괭이, 신발, 화살표 모양을 가진 버튼 세가지 상태가 플레이어의 기본 상태라 할 수 있겠습니다.
+        이상으로 튜토리얼을 마치겠습니다.""")
+        self.game.UIManager.dialogManager.next()
 
     def loadSave(self, saveFilePath):
         with open(saveFilePath, 'rb') as file:
             save = pickle.load(file)
         self.islands, self.fire, self.water, self.air, self.lightening, self.combo, self.prvElement,self.currentIslandIndex, self.level = save.islands, save.fire, save.water, save.air, save.lightening, save.combo, save.prvElement, save.currentIslandIndex, save.level
 
+        for i in self.islands:
+            for l in i.objects:
+                l.load(self.game)
     def save(self):
         gameSave = GameSave(self.islands, self.fire, self.water,
                             self.air, self.lightening, self.combo, self.prvElement, self.currentIslandIndex, self.level)
-        with open('testGameSave.pkl', 'wb') as file:
+        with open('save.pkl', 'wb') as file:
             pickle.dump(gameSave, file)
 
     def load(self):
@@ -134,6 +159,7 @@ class GameManager:
             timeCounter += dt
 
             self.game.timer.update()
+            self.game.UITimer.update()
             # Update logic here
 
             self.game.eventHandler.update()

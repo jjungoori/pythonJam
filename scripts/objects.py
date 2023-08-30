@@ -291,8 +291,8 @@ class Island(TileObject):
 
     def load(self, game):
         self.game = game
-        for i in self.objects:
-            i.load(self.game)
+        # for i in self.objects:
+        #     i.load(self.game)
 
         self.currentObject = self.objects[self.currentObjectIndex]
 
