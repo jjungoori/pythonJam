@@ -1,5 +1,6 @@
 import os
 import pygame
+import random
 from scripts.constants import *
 
 
@@ -51,6 +52,25 @@ def textWrap(text, font, maxWidth):
 
     lines.append(' '.join(line))
     return lines
+
+def lvTo6(level):
+    y = 1 + (level/3)
+    if y > 6:
+        y = 6
+    return int(y)
+
+
+def lvToRare(level, MAX):
+    r = random.randint(0, MAX)
+    w = level / 100.0
+
+    wr = int((r * w) + r)
+
+    if wr > MAX:
+        wr = MAX
+
+    return wr
+
 
 class Animation:
     def __init__(self, images, img_dur=5, loop=True, start=True):

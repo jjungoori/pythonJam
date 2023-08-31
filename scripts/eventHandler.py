@@ -27,8 +27,10 @@ class EventHandler:
                 pygame.quit()
                 sys.exit()
             elif event.type == pygame.MOUSEBUTTONDOWN:
-
+                b = self.game.UIManager.dialog.update()
                 a = self.game.UIManager.uiEvent()
+                if b:
+                    continue
                 if a:
                     self.btnOns.append(a[1])
                     continue
@@ -78,7 +80,7 @@ class EventHandler:
                     # self.game.currentIsland.objects[0].spawnTileObject(self.game)
 
                     # targetZoom += 0.5
-                elif event.key == pygame.K_w:
+                elif event.key == pygame.K_w or event.key == pygame.K_UP:
                     print("K")
                     self.game.UIManager.dialogManager.next()
 

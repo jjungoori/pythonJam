@@ -15,7 +15,7 @@ class GameManager:
         self.zoomFactor = 3
         self.player_speed = 1
 
-        self.viewport = pygame.Rect(0, 0, SCREEN_WIDTH, SCREEN_HEIGHT)  # Define viewport here
+        self.viewport = pygame.Rect(0, 0, SCREEN_WIDTH, SCREEN_HEIGHT)
         self.camPos = np.array((0, 0), dtype=float)
 
         self.clock = pygame.time.Clock()
@@ -61,7 +61,7 @@ class GameManager:
         self.action = 0
 
         self.water = 0
-        self.fire = 0
+        self.fire = 500
         self.lightening = 0
         self.air = 0
 
@@ -92,8 +92,10 @@ class GameManager:
         이 상태에서는 자동으로 업그레이드 메뉴가 뜨며, 화면의 좌우를 터치하여 메뉴를 전환할 수 있습니다.
         각각의 메뉴에서는 현재 플레이어가 있는 섬 또는 채집지에 대한 업그레이드가 가능합니다.
         화면 좌측 상단에 있는 사색의 숫자들이 플레이어가 가지고 있는 자원, 원소들의 양이며, 업그레이드에는 이 원소들이 소비됩니다.
+        빨강, 파랑, 청록, 노랑 별로 불, 물, 공기, 전기 원소입니다.
         또한 New Island라는 제목을 가진 메뉴에서는 새로운 섬을 개척할 수 있습니다.
         새로운 섬을 개척하는 것이 이 게임의 궁극적인 목표이자, 이를 통해 플레이어는 더욱 많은 자원을 얻을 수 있습니다.
+        기본으로 지급되는 불 원소 500개가 있으니 잘 사용하여 섬을 확장해 보세요!
         한 번 더 가운데 위치한 버튼을 눌러보면 버튼이 다시 곡괭이 모양이 된 것을 볼 수 있습니다.
         곡괭이, 신발, 화살표 모양을 가진 버튼 세가지 상태가 플레이어의 기본 상태라 할 수 있겠습니다.
         이상으로 튜토리얼을 마치겠습니다.""")
@@ -160,7 +162,6 @@ class GameManager:
 
             self.game.timer.update()
             self.game.UITimer.update()
-            # Update logic here
 
             self.game.eventHandler.update()
 
@@ -238,21 +239,22 @@ class GameManager:
                 self.updateMenu()
 
     def mine(self, element):
+        self.game.upgradeAdapter.calc()
         if self.prvElement == element:
             #calc added feature
-            addedCombo = 1000 # comboValue
-            if 'add' in self.game.gameManager.currentIsland.currentObject.upgrades:
-                addedCombo += self.mineUpgrades['add']['values'][self.game.gameManager.currentIsland.currentObject.upgrades['add']]
+            addedCombo = 1 # comboValue
 
-            if element == 0 and 'fireAdd' in self.game.gameManager.currentIsland.currentObject.upgrades:
-                addedCombo += self.mineUpgrades['fireAdd']['values'][self.game.gameManager.currentIsland.currentObject.upgrades['fireAdd']]
-            if element == 1 and 'waterAdd' in self.game.gameManager.currentIsland.currentObject.upgrades:
-                addedCombo += self.mineUpgrades['waterAdd']['values'][self.game.gameManager.currentIsland.currentObject.upgrades['waterAdd']]
-            if element == 2 and 'airAdd' in self.game.gameManager.currentIsland.currentObject.upgrades:
-                addedCombo += self.mineUpgrades['airAdd']['values'][self.game.gameManager.currentIsland.currentObject.upgrades['airAdd']]
+            addedCombo += self.game.upgradeAdapter.add
 
+            if element == 0:
+                addedCombo += self.game.upgradeAdapter.fire
+            if element == 1:
+                addedCombo += self.game.upgradeAdapter.water
+            if element == 2:
+                addedCombo += self.game.upgradeAdapter.air
 
             self.combo += addedCombo
+
         else:
             if self.combo > 200:
                 self.game.assets.sounds['fail200'].play()

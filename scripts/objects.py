@@ -95,12 +95,15 @@ def getTileMine(jsonFile, pos, game):
         return TileMine(**data, targetTilemap=game.gameManager.tilemaps['object'], game = game, pos = pos)
    #
 def getRandomTileMine(pos, game):
-    upgradeVal = random.randint(0, game.gameManager.maxChance)
+
     upgrades = {}
 
-    for i in game.gameManager.upgradeChances:
-        if game.gameManager.upgradeChances[i] >= upgradeVal:
-            upgrades[i] = 0
+    for _ in range(lvTo6(game.gameManager.level)):
+        upgradeVal = lvToRare(game.gameManager.level, game.gameManager.maxChance)
+        for i in game.gameManager.upgradeChances:
+            if game.gameManager.upgradeChances[i] >= upgradeVal:
+                upgrades[i] = 0
+                break
 
     a  = [0, 1, 2, 3]
     return TileMine(

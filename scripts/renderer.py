@@ -33,6 +33,8 @@ class Renderer:
         #                             self.game.gameManager.viewport)
         # self.screen.blit(self.display, (0, 0))
 
+
+
         self.game.gameManager.zoomFactor = (1 - CAM_LERP_SPEED * dt) * self.game.gameManager.zoomFactor + CAM_LERP_SPEED * dt * self.targetZoom
         self.game.gameManager.camPos = (1 - CAM_LERP_SPEED * dt) * self.game.gameManager.camPos + CAM_LERP_SPEED * dt * (self.targetPos + np.array((0,5)))
 

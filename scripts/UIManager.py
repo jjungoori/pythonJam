@@ -149,13 +149,13 @@ class GameMenuItems:
 
         txt = self.game.assets.middleFont.render(self.title, True, (220, 220, 220))
         zoomedScreen.blit(txt, bgPos + np.array((40, 20)))
-        txtHeight += 40  # Adding height for title
+        txtHeight += 40
 
         wrappedDescription = textWrap(self.description, self.game.assets.font, 200)
         for j, line in enumerate(wrappedDescription):
             txt = self.game.assets.font.render(line, True, (150, 150, 150))
             zoomedScreen.blit(txt, bgPos + np.array((40, 50 + j * 20)))
-        txtHeight += (len(wrappedDescription) * 20 + 10)  # Adding height for description
+        txtHeight += (len(wrappedDescription) * 20 + 10)
 
         if self.button != 0:
             btnPos = bgPos + np.array((265, 55))
@@ -179,7 +179,7 @@ class GameMenuItems:
             txt4Pos = txt3Pos + np.array((txt3.get_width() + 10, 0))
             zoomedScreen.blit(txt4, txt4Pos)
 
-            txtHeight += 60  # Adding height for button and cost
+            txtHeight += 60
 
         return txtHeight
 
@@ -366,6 +366,26 @@ class Dialog:
         self.wrappedText = textWrap("", self.game.assets.font, self.bg.get_width() - 50)
         self.bgPos = colCenter(self.bg, bottom(self.bg, (0, 0))) - np.array((0, 200))
         self.on = False
+        self.start = None
+        self.end = None
+
+        def temp():
+            self.game.UIManager.dialogManager.next()
+        self.func = temp
+
+        self.fixColl()
+
+    def fixColl(self):
+        self.start = self.bgPos
+        self.end = self.bgPos + np.array((self.bg.get_width(), self.bg.get_height()))
+
+    def update(self):
+        mp = pygame.mouse.get_pos()
+        if mp[0] < self.end[0] and mp[0] > self.start[0] and mp[1] < self.end[1] and mp[1] > self.start[1]:
+            self.func()
+            return True
+
+        return False
 
     def setText(self, text):
         self.text = text

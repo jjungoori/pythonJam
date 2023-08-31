@@ -2,6 +2,7 @@ from scripts.renderer import *
 from scripts.eventHandler import *
 from scripts.gameManager import *
 from scripts.assets import *
+from scripts.upgradeAdapter import *
 from scripts.UIManager import *
 
 import os.path
@@ -20,6 +21,7 @@ class Game:
         self.UIManager = UIManager(self)
         self.timer = Timer()
         self.UITimer = Timer()
+        self.upgradeAdapter = UpgradeAdapter(self)
 
         self.UIManager.run()
 
