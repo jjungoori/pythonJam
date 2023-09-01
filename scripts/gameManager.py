@@ -60,10 +60,10 @@ class GameManager:
         #for actions, 0 : mine, 1 : move, 2 : upgrade
         self.action = 0
 
-        self.water = 0
-        self.fire = 500
-        self.lightening = 0
-        self.air = 0
+        self.water = 111110
+        self.fire = 1111500
+        self.lightening = 111110
+        self.air = 111110
 
         self.level = 0
 

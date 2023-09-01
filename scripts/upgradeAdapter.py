@@ -8,6 +8,13 @@ class UpgradeAdapter:
         self.add = 0
 
     def calc(self):
+        self.fire = 0
+        self.water = 0
+        self.air = 0
+        self.lightening = 0
+        self.add = 0
+
+
         if 'add' in self.game.gameManager.currentIsland.currentObject.upgrades:
             self.add = self.game.gameManager.mineUpgrades['add']['values'][
                 self.game.gameManager.currentIsland.currentObject.upgrades['add']]
