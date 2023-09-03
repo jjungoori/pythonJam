@@ -3,11 +3,11 @@ from scripts.UIManager import *
 class DialogManager:
     def __init__(self, game):
         self.dialogs = [
-            "hello my name is chick",
-            "I love you man",
-            "aya",
-            "hoohohjohjaiojsdiofjosidf",
-            "hello my name is chick"
+            # "hello my name is chick",
+            # "I love you man",
+            # "aya",
+            # "hoohohjohjaiojsdiofjosidf",
+            # "hello my name is chick"
         ]
         self.behavior = 0
         self.game = game

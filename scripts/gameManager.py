@@ -60,10 +60,10 @@ class GameManager:
         #for actions, 0 : mine, 1 : move, 2 : upgrade
         self.action = 0
 
-        self.water = 111110
-        self.fire = 1111500
-        self.lightening = 111110
-        self.air = 111110
+        self.water = 500
+        self.fire = 500
+        self.lightening = 5
+        self.air = 500
 
         self.level = 0
 
@@ -242,7 +242,7 @@ class GameManager:
         self.game.upgradeAdapter.calc()
         if self.prvElement == element:
             #calc added feature
-            addedCombo = 1 # comboValue
+            addedCombo = 10 # comboValue
 
             addedCombo += self.game.upgradeAdapter.add
 
@@ -252,6 +252,13 @@ class GameManager:
                 addedCombo += self.game.upgradeAdapter.water
             if element == 2:
                 addedCombo += self.game.upgradeAdapter.air
+
+            if self.combo > 1000:
+                addedCombo *= 4
+            elif self.combo > 500:
+                addedCombo *= 3
+            elif self.combo > 100:
+                addedCombo *= 2
 
             self.combo += addedCombo
 

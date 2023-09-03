@@ -52,6 +52,16 @@ class UIManager:
         txt = self.game.assets.font.render("Combo", True, (180, 180, 180))
         zoomedScreen.blit(txt, colCenter(txt, (0, 80)))
 
+        if self.game.gameManager.combo > 1000:
+            txt = self.game.assets.font.render("COMBO!!! X 4", True, (83, 87, 92))
+            zoomedScreen.blit(txt, colCenter(txt, (0, 110)))
+        elif self.game.gameManager.combo > 500:
+            txt = self.game.assets.font.render("COMBO!!! X 3", True, (83, 87, 92))
+            zoomedScreen.blit(txt, colCenter(txt, (0, 110)))
+        elif self.game.gameManager.combo > 100:
+            txt = self.game.assets.font.render("COMBO!!! X 2", True, (83, 87, 92))
+            zoomedScreen.blit(txt, colCenter(txt, (0, 110)))
+
         txt = self.game.assets.font.render(str(self.game.gameManager.fire), True, (200, 100, 100))
         zoomedScreen.blit(txt, np.array((20, 20)))
         txt = self.game.assets.font.render(str(self.game.gameManager.water), True, (100, 100, 200))
@@ -60,6 +70,12 @@ class UIManager:
         zoomedScreen.blit(txt, np.array((20, 60)))
         txt = self.game.assets.font.render(str(self.game.gameManager.lightening), True, (160, 160, 100))
         zoomedScreen.blit(txt, np.array((20, 80)))
+
+
+
+
+        txt = self.game.assets.font.render("Press Q to save!", True, (83, 87, 92))
+        zoomedScreen.blit(txt, bottom(txt, (0,0)) + np.array((10,-10)))
 
         if self.game.UIManager.menu.on:
             menu = self.game.UIManager.menu
@@ -333,7 +349,7 @@ class GameMenu:
 
         temp = partial(self.tempNewIsland, cost, island)
 
-        des = "Get the new random island!"
+        des = "Get a new random island!"
 
         if not island.foundNew:
             if self.game.gameManager.fire >= cost[0] and self.game.gameManager.water >= \

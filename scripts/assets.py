@@ -7,6 +7,11 @@ class Assets:
         self.largeFont = pygame.font.Font('resources/stardust.ttf', 40)
         self.middleFont = pygame.font.Font('resources/stardust.ttf', 25)
 
+        # self.vignette = load_image('vignette.png')
+        # self.vignette = pygame.transform.scale(self.vignette, (SCREEN_HEIGHT, self.vignette.get_height()*(SCREEN_HEIGHT/self.vignette.get_width())))
+        # self.vignette = pygame.transform.rotate(self.vignette, 90)
+        # self.vignette.set_alpha(100)
+
         self.images = {
             'player/idle': Animation(load_images('entity/player'), img_dur=10),
             'ui/elements': load_images('ui/elements'),
@@ -33,7 +38,8 @@ class Assets:
             'jump': pygame.mixer.Sound('resources/sound/jump.wav'),
             'fail50': pygame.mixer.Sound('resources/sound/fail50.wav'),
             'fail200': pygame.mixer.Sound('resources/sound/fail200.wav'),
-            'change': pygame.mixer.Sound('resources/sound/change.wav')
+            'change': pygame.mixer.Sound('resources/sound/change.wav'),
+            'save' : pygame.mixer.Sound('resources/sound/save.wav')
         }
 
 

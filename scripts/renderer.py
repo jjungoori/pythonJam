@@ -12,6 +12,7 @@ class Renderer:
         self.display = pygame.Surface((SCREEN_WIDTH, SCREEN_HEIGHT))
         self.shake = 10
         self.game = game
+        # self.vignette = True
         # self.targetPos = self.game.gameManager.player.pos
         self.camTarget = 0 # 0 : player, 1 : free
 
@@ -65,6 +66,8 @@ class Renderer:
         zoomedScreen = pygame.transform.scale(capturedScreen, (
             int(SCREEN_WIDTH * self.game.gameManager.zoomFactor), int(SCREEN_HEIGHT * self.game.gameManager.zoomFactor)))
         # ------------------shader--------------
+        # if self.vignette:
+        #     zoomedScreen.blit(self.game.assets.vignette, bottom(self.game.assets.vignette, (0,0)))
         if self.game.UIManager.menu.on:
             translucentMask = pygame.Surface(zoomedScreen.get_size(), pygame.SRCALPHA)
             translucentColor = (0, 0, 0, 100)

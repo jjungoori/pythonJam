@@ -58,6 +58,9 @@ class EventHandler:
                 elif event.key == pygame.K_RIGHT:
                     # self.game.gameManager.movement[1] = True
                     self.rightC()
+                if event.key == pygame.K_q:
+                    self.game.assets.sounds['save'].play()
+                    self.game.gameManager.save()
 
             elif event.type == pygame.KEYUP:
                 if event.key == pygame.K_LEFT:
@@ -70,14 +73,7 @@ class EventHandler:
                 if event.key == pygame.K_DOWN:
                     self.game.gameManager.movement[3] = False
                     pass
-                if event.key == pygame.K_q:
-                    self.game.gameManager.save()
-                    # self.game.gameManager.islands.append(Island(
-                    #
-                    # ))
-                    # self.game.currentIsland.currentObject = getRandomTileMine(game = self.game, pos = self.game.currentIsland.currentObject.pos)
-                    pass
-                    # self.game.currentIsland.objects[0].spawnTileObject(self.game)
+
 
                     # targetZoom += 0.5
                 elif event.key == pygame.K_w or event.key == pygame.K_UP:
