@@ -2,6 +2,7 @@ from scripts.utils import *
 import numpy as np
 from functools import partial
 from scripts.dialogManager import *
+import copy
 
 class UIManager:
     def __init__(self, game):
@@ -246,11 +247,27 @@ class GameMenu:
             self.game.gameManager.currentIsland.upgrade(i)
             self.updateFromIsland(self.game.gameManager.currentIsland)
 
+    def tempPlayer(self, cost, i):
+
+        if self.game.gameManager.fire >= cost[0] and self.game.gameManager.water >= cost[
+            1] and self.game.gameManager.air >= cost[2] and self.game.gameManager.lightening >= \
+                cost[3]:
+            # print("k")
+            self.game.gameManager.fire -= cost[0]
+            self.game.gameManager.water -= cost[1]
+            self.game.gameManager.air -= cost[2]
+            self.game.gameManager.lightening -= cost[3]
+
+            self.game.gameManager.playerAtt.upgrades[i] += 1
+
+            self.updateFromPlayer()
+
+
     def tempNewIsland(self, cost, island):
-        print("hhhh")
+        # print("hhhh")
         if self.game.gameManager.fire >= cost[0] and self.game.gameManager.water >= cost[
             1] and self.game.gameManager.air >= cost[2] and self.game.gameManager.lightening >= cost[3]:
-            print("ggggg")
+            # print("ggggg")
 
             island.foundNew = True
             self.game.gameManager.level += 1
@@ -264,6 +281,8 @@ class GameMenu:
 
             self.changeAct(2)
             self.game.timer.add(1, self.game.gameManager.spawnNewIsland)
+
+
 
     def changeAct(self, num):
         self.game.gameManager.changeAct()
@@ -308,19 +327,6 @@ class GameMenu:
             # print("dbg : ", data)
             key = island.upgrades[i]
             temp = partial(self.tempIsland, data, key, i)
-            # def temp():
-            #     print("dbg2 : ", data)
-            #     print(self.game.gameManager.water, data['costs'][key][1])
-            #     print(self.game.gameManager.fire >= data['costs'][key][0], self.game.gameManager.water >= data['costs'][key][1], self.game.gameManager.air >= data['costs'][key][2], self.game.gameManager.lightening >= data['costs'][key][3])
-            #     if self.game.gameManager.fire >= data['costs'][key][0] and self.game.gameManager.water >= data['costs'][key][1] and self.game.gameManager.air >= data['costs'][key][2] and self.game.gameManager.lightening >= data['costs'][key][3]:
-            #         print("k")
-            #         self.game.gameManager.fire -= data['costs'][key][0]
-            #         self.game.gameManager.water -= data['costs'][key][1]
-            #         self.game.gameManager.air -= data['costs'][key][2]
-            #         self.game.gameManager.lightening -= data['costs'][key][3]
-            #
-            #         self.game.gameManager.currentIsland.currentObject.upgrade(i)
-            #         self.updateFromMine(self.game.gameManager.currentIsland.currentObject)
 
             if len(data['costs']) - 1 > key:
                 if self.game.gameManager.fire >= data['costs'][key][0] and self.game.gameManager.water >= data['costs'][key][1] and self.game.gameManager.air >= data['costs'][key][2] and self.game.gameManager.lightening >= data['costs'][key][3]:
@@ -338,6 +344,51 @@ class GameMenu:
                                             data['descriptions'][key])
             gmi.cost = data['costs'][key]
             self.items.append(gmi)
+
+    def updateFromPlayer(self):
+        self.title = "Player"
+        self.items = [
+
+        ]
+        for i in self.game.gameManager.playerAtt.upgrades:
+            data = []
+            data = copy.deepcopy(self.game.gameManager.playerUpgrades[i])  #deepcopy
+            # print("dbg : ", data)
+            key = self.game.gameManager.playerAtt.upgrades[i]
+
+            mul = 1
+            if  data['infinity']:
+                mul += key//len(data['costs'])
+                pk = key
+                key = key%len(data['costs'])-1
+                print("key :", key)
+                if key == -1:
+                    mul = (pk+1)//(len(data['costs']))
+
+                print(mul)
+                for l in range(len(data['costs'][key])):
+                    data['costs'][key][l] *= mul
+                    print(data['costs'][key][l])
+
+            temp = partial(self.tempPlayer, data['costs'][key], i)  # !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+
+            if len(data['costs']) - 1 > key:
+                if self.game.gameManager.fire >= data['costs'][key][0] and self.game.gameManager.water >= data['costs'][key][1] and self.game.gameManager.air >= data['costs'][key][2] and self.game.gameManager.lightening >= data['costs'][key][3]:
+                    btn = ImageButton([self.game.assets.images['ui/smallBtn.png'], self.game.assets.images['ui/smallBtnPressed.png']],
+                                      (0, 0), temp)
+                else:
+                    btn = ImageButton([self.game.assets.images['ui/smallBtnPressed.png'], self.game.assets.images['ui/smallBtnPressed.png']],
+                                      (0, 0), temp)
+
+            else:
+                btn = 0
+
+            gmi = GameMenuItems(self.game, 0,
+                                            btn, data['title'],
+                                            data['description'])
+            gmi.cost = data['costs'][key]
+            self.items.append(gmi)
+
 
     def updateFromNew(self, island):
         self.title = "New Island"

@@ -1,0 +1,26 @@
+{
+  "hp" : {
+      "title" : "HP",
+      "description" :  "HP + 1",
+      "costs" : [[100, 0, 0, 0], [0, 100, 0, 0], [0, 0, 100, 0], [0, 0, 0, 100]],
+      "infinity" : 1
+    },
+    "reviver" : {
+      "title" : "The Reviver",
+      "description" :  "When you revive from the death, you get Extra resources in proportion the HP",
+      "costs" : [[1000,1000,1000,1000]],
+      "infinity" : 0
+    },
+    "attacker" : {
+      "title" : "Attacker",
+      "description" :  "In boss fight, you can deal more damage",
+      "costs" : [[1000,1000,1000,1000]],
+      "infinity" : 0
+    },
+    "psychopath" : {
+      "title" : "The Psychopath",
+      "description" :  "Get X 10 resources but you may be a little strange",
+      "costs" : [[1000,1000,1000,1000]],
+      "infinity" : 0
+    }
+}

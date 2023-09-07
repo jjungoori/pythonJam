@@ -12,6 +12,7 @@ CAM_LERP_SPEED = 3
 #player speed in main.py 32
 
 ISLAND_COST = [
+    [0, 0, 0, 0],
     [500, 0, 0, 0],
     [0, 500, 0, 0],
     [0, 0, 500, 0],

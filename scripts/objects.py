@@ -3,7 +3,8 @@ import json
 from scripts.utils import *
 from scripts.particle import *
 import pickle
-
+import csv
+import numpy as np
 
 
 class GameObject(pygame.sprite.Sprite):
@@ -31,14 +32,32 @@ class GameObject(pygame.sprite.Sprite):
         screen.blit(self.animation.img(), (objectScreenX, objectScreenY))
 
 class Player(GameObject):
-    def __init__(self, animation, position):
+    def __init__(self, animation, position, game):
         super().__init__(animation, position)
+        self.game = game
+        self.hpBarAlpha = 0
+
     def render(self, screen, viewport):
-        screen.blit(self.animation.img(), self.pos - (viewport.top, viewport.left))
+        dispPos = self.pos - (viewport.top, viewport.left)
+        screen.blit(self.animation.img(), dispPos)
 
+        hpPercent = self.game.gameManager.playerAtt.hp / self.game.gameManager.playerAtt.maxHP
 
-import csv
-import numpy as np
+        hpBarWidth = 18
+        hpBarHeight = 3
+
+        hpX = dispPos[0] - hpBarWidth/2 + 8
+        hpY = dispPos[1] - hpBarHeight/2 - 2
+
+        hpBarSurface = pygame.Surface((hpBarWidth, hpBarHeight), pygame.SRCALPHA)
+
+        hpBarSurface.fill((0, 0, 0, 0))  # Clear surface
+        pygame.draw.rect(hpBarSurface, (255, 0, 0, min(self.hpBarAlpha, 255)), (0, 0, hpBarWidth, hpBarHeight))
+        pygame.draw.rect(hpBarSurface, (0, 255, 0, min(self.hpBarAlpha, 255)), (0, 0, hpBarWidth * hpPercent, hpBarHeight))
+        screen.blit(hpBarSurface, (hpX, hpY))
+
+        self.hpBarAlpha *= 0.9
+
 
 class TileObject:
     def __init__(self, pos, targetTilemap, csvStructure):
@@ -86,7 +105,7 @@ class TileObject:
             self.structure[y, x] = newTileIndex
             self.targetTilemap.map[y + self.pos[1], x + self.pos[0]] = newTileIndex
         else:
-            print("Coordinates are out of bounds")
+            print("out of bounds")
 
 
 def getTileMine(jsonFile, pos, game):
@@ -115,7 +134,7 @@ def getRandomTileMine(pos, game):
 class TileMine(TileObject):
 
     def __init__(self, pos, targetTilemap, csvStructure, game, upgrades, elements):
-        print("tilemineSpwan")
+        # print("tilemineSpwan")
         super().__init__(pos, targetTilemap, csvStructure)
         self.tileMatch = {
             1 : [[48, 70, 92], [115, 137, 159]],
@@ -133,7 +152,7 @@ class TileMine(TileObject):
         self.readyObject = 0
 
         # self.load(game)
-        print("tilemineSpawned")
+        # print("tilemineSpawned")
         # self.sync()
 
     def __getstate__(self):
@@ -248,9 +267,9 @@ class Island(TileObject):
         self.pre()
 
     def pre(self):
-        print("island innit")
+        # print("island innit")
         self.objects['tilemines'] = []
-        print(self.structure)
+        # print(self.structure)
         for y in range(len(self.structure)):
             for x in range(len(self.structure[0])):
 
@@ -262,27 +281,27 @@ class Island(TileObject):
                     self.end = (x, y)
 
                 elif self.structure[y][x] == 63:
-                    print("1 1 1")
+                    # print("1 1 1")
                     self.structure[y][x] = 134
                     self.objects['tilemines'].append(['resources/map/basicTileMine.json', (x, y)])
 
                 elif self.structure[y][x] == 61:
-                    print("2 2 2")
+                    # print("2 2 2")
                     self.structure[y][x] = -1
                     self.objects['tilemines'].append(['resources/map/basicTileMine.json', (x, y)])
 
-        print("my struct : ", self.structure)
+        # print("my struct : ", self.structure)
         # self.placeOnTilemap()
 
 
-        print("omg : ", self.objects)
+        # print("omg : ", self.objects)
         self.objects = getObjectsFromDict(self.objects, self.game, self.pos)
-        print("this : ", self.objects)
+        # print("this : ", self.objects)
         self.resetObjects()
-        print("donenene")
+        # print("donenene")
 
         self.currentObject = self.objects[self.currentObjectIndex]
-        print(self.currentObject)
+        # print(self.currentObject)
         self.placeOnTilemap()
 
 
@@ -334,9 +353,9 @@ def getObjectsFromDict(objsDict, game, pos):
         # print(i)
         if i == "tilemines":
             for l in objsDict[i]:
-                print(l)
+                # print(l)
                 temp = getTileMine(l[0], pos + np.array(l[1]), game=game)
                 # temp = getRandomTileMine(pos + np.array(l[1]), game = game)
                 objs.append(temp)
-    print(objs)
+    # print(objs)
     return objs

@@ -61,6 +61,9 @@ class EventHandler:
                 if event.key == pygame.K_q:
                     self.game.assets.sounds['save'].play()
                     self.game.gameManager.save()
+                if event.key == pygame.K_w:
+                    self.game.gameManager.playerAtt.hp += 1
+                    print(self.game.gameManager.playerAtt.hp)
 
             elif event.type == pygame.KEYUP:
                 if event.key == pygame.K_LEFT:
@@ -77,7 +80,7 @@ class EventHandler:
 
                     # targetZoom += 0.5
                 elif event.key == pygame.K_w or event.key == pygame.K_UP:
-                    print("K")
+                    # print("K")
                     self.game.UIManager.dialogManager.next()
 
             if self.dragging:

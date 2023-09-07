@@ -19,7 +19,6 @@ class GameManager:
         self.camPos = np.array((0, 0), dtype=float)
 
         self.clock = pygame.time.Clock()
-        self.movement = [False, False, False, False]
 
         self.tilemaps = {
             'main': StaticTilemap(
@@ -30,7 +29,7 @@ class GameManager:
                 size=(WORLD_HEIGHT, WORLD_WIDTH))
         }
         self.now = 0
-        self.player = Player(self.game.assets.images["player/idle"], tilePosToPos((14, 8))),
+        self.player = Player(self.game.assets.images["player/idle"], tilePosToPos((14, 8)), self.game),
         self.particles = []
         self.objects = []
         self.tileObjects = []
@@ -39,11 +38,13 @@ class GameManager:
 
         self.currentIsland = None
         self.currentIslandIndex = 0
+        self.playerAtt = PlayerAtt()
 
 
         with open('resources/map/mineUpgrades.json', 'r') as file:
             data = json.load(file)
             self.mineUpgrades = data
+
         self.upgradeChances = {}
 
         chanceGen = 0
@@ -52,6 +53,10 @@ class GameManager:
             chanceGen += data[i]['chance']
             self.upgradeChances[i] = chanceGen
         self.maxChance = chanceGen
+
+        with open('resources/map/player.json', 'r') as file:
+            data = json.load(file)
+            self.playerUpgrades = data
 
         #for mines
         self.combo = 0
@@ -62,7 +67,7 @@ class GameManager:
 
         self.water = 500
         self.fire = 500
-        self.lightening = 5
+        self.lightening = 100
         self.air = 500
 
         self.level = 0
@@ -95,7 +100,7 @@ class GameManager:
         빨강, 파랑, 청록, 노랑 별로 불, 물, 공기, 전기 원소입니다.
         또한 New Island라는 제목을 가진 메뉴에서는 새로운 섬을 개척할 수 있습니다.
         새로운 섬을 개척하는 것이 이 게임의 궁극적인 목표이자, 이를 통해 플레이어는 더욱 많은 자원을 얻을 수 있습니다.
-        기본으로 지급되는 불 원소 500개가 있으니 잘 사용하여 섬을 확장해 보세요!
+        처음으로 하는 섬 확장은 무료이니 지금 바로 섬을 확장해 보세요!
         한 번 더 가운데 위치한 버튼을 눌러보면 버튼이 다시 곡괭이 모양이 된 것을 볼 수 있습니다.
         곡괭이, 신발, 화살표 모양을 가진 버튼 세가지 상태가 플레이어의 기본 상태라 할 수 있겠습니다.
         이상으로 튜토리얼을 마치겠습니다.""")
@@ -104,14 +109,14 @@ class GameManager:
     def loadSave(self, saveFilePath):
         with open(saveFilePath, 'rb') as file:
             save = pickle.load(file)
-        self.islands, self.fire, self.water, self.air, self.lightening, self.combo, self.prvElement,self.currentIslandIndex, self.level = save.islands, save.fire, save.water, save.air, save.lightening, save.combo, save.prvElement, save.currentIslandIndex, save.level
+        self.islands, self.fire, self.water, self.air, self.lightening, self.combo, self.prvElement,self.currentIslandIndex, self.level, self.playerAtt = save.islands, save.fire, save.water, save.air, save.lightening, save.combo, save.prvElement, save.currentIslandIndex, save.level, save.playerAtt
 
         for i in self.islands:
             for l in i.objects:
                 l.load(self.game)
     def save(self):
         gameSave = GameSave(self.islands, self.fire, self.water,
-                            self.air, self.lightening, self.combo, self.prvElement, self.currentIslandIndex, self.level)
+                            self.air, self.lightening, self.combo, self.prvElement, self.currentIslandIndex, self.level, self.playerAtt)
         with open('save.pkl', 'wb') as file:
             pickle.dump(gameSave, file)
 
@@ -165,28 +170,18 @@ class GameManager:
 
             self.game.eventHandler.update()
 
-            if self.movement[0]:
-                self.player[0].pos[0] -= 1
-            if self.movement[1]:
-                self.player[0].pos[0] += 1
-            if self.movement[2]:
-                self.player[0].pos[1] -= 1
-            if self.movement[3]:
-                self.player[0].pos[1] += 1
-
-
             self.game.renderer.render(dt)
             self.now += self.clock.tick(60)
 
     def act(self, *args):
 
         if self.action == 0:
-            print("okay")
+            # print("okay")
             targetObject = self.game.gameManager.currentIsland.currentObject
             if type(targetObject) == TileMine:
-                print("then")
+                # print("then")
                 if not targetObject.on:
-                    print("yay")
+                    # print("yay")
                     if not targetObject.working:
                         targetObject.working = True
                         targetObject.spawnTileObject(self.game)
@@ -242,7 +237,7 @@ class GameManager:
         self.game.upgradeAdapter.calc()
         if self.prvElement == element:
             #calc added feature
-            addedCombo = 10 # comboValue
+            addedCombo = 1 # comboValue
 
             addedCombo += self.game.upgradeAdapter.add
 
@@ -263,24 +258,33 @@ class GameManager:
             self.combo += addedCombo
 
         else:
-            if self.combo > 200:
-                self.game.assets.sounds['fail200'].play()
-            else:
-                self.game.assets.sounds['fail50'].play()
+            self.playerAttacked(1)
+            if self.playerAtt.hp <= 0:
+                self.playerAtt.hp = self.playerAtt.maxHP
 
-            addEle = self.combo
-            if self.prvElement == 0:
-                self.fire += addEle
-            elif self.prvElement == 1:
-                self.water += addEle
-            elif self.prvElement == 2:
-                self.air += addEle
-            elif self.prvElement == 3:
-                self.lightening += addEle
+                if self.combo > 200:
+                    self.game.assets.sounds['fail200'].play()
+                else:
+                    self.game.assets.sounds['fail50'].play()
 
-            self.game.renderer.shakeScreen(min(self.combo/10, 300))
-            self.combo = 0
-        self.prvElement = element
+                addEle = self.combo
+                if self.prvElement == 0:
+                    self.fire += addEle
+                elif self.prvElement == 1:
+                    self.water += addEle
+                elif self.prvElement == 2:
+                    self.air += addEle
+                elif self.prvElement == 3:
+                    self.lightening += addEle
+
+                self.game.renderer.shakeScreen(min(self.combo / 10, 300))
+                self.combo = 0
+
+                self.prvElement = element
+        if self.combo == 0:
+            self.prvElement = element
+            self.playerAtt.hp = self.playerAtt.maxHP
+
         return
 
 
@@ -324,17 +328,19 @@ class GameManager:
     #                         data['descriptions'][key])
     #     gmi.cost = data['costs'][key]
     #     self.items.append(gmi)
-
+    def playerAttacked(self, value):
+        self.playerAtt.hp -= value
+        self.player[0].hpBarAlpha = 2000
     def updateMenu(self):
         if self.game.UIManager.menuIndex == 0:
             self.game.UIManager.menu.updateFromMine(self.game.gameManager.currentIsland.currentObject)
         elif self.game.UIManager.menuIndex == 1:
-            self.game.UIManager.menu.updateFromIsland(self.game.gameManager.currentIsland)
+            self.game.UIManager.menu.updateFromPlayer()
         elif self.game.UIManager.menuIndex == 2:
             self.game.UIManager.menu.updateFromNew(self.game.gameManager.currentIsland)
 
     def spawnNewIsland(self):
-        print(self.currentIsland.end)
+        # print(self.currentIsland.end)
 
         a = random.randint(-1, 3)
         b = 3 - a
@@ -351,8 +357,18 @@ class GameManager:
         self.islands.append(
             Island(self.currentIsland.pos + np.array(self.currentIsland.end) + np.array((a, b)), "resources/map/" + str(random.randint(2, 8)) + ".csv", self.tilemaps['main'], self.game))
 
+class PlayerAtt:
+    def __init__(self):
+        self.hp = 1
+        self.maxHP = 1
+
+        self.upgrades = {
+            'hp' : 1
+        }
+
+
 class GameSave:
-    def __init__(self, islands, fire, water, air, lightening, combo, prvElement, currentIslandIndex, level):
+    def __init__(self, islands, fire, water, air, lightening, combo, prvElement, currentIslandIndex, level, playerAtt):
         self.islands = islands
         self.fire = fire
         self.water = water
@@ -362,3 +378,4 @@ class GameSave:
         self.prvElement = prvElement
         self.currentIslandIndex = currentIslandIndex
         self.level = level
+        self.playerAtt = playerAtt
