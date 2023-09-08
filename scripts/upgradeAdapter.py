@@ -7,6 +7,7 @@ class UpgradeAdapter:
         self.lightening = 0
         self.add = 0
 
+
     def calc(self):
         self.fire = 0
         self.water = 0

@@ -366,6 +366,10 @@ class PlayerAtt:
             'hp' : 1
         }
 
+    def adaptUpgrade(self):
+        if 'hp' in self.upgrades:
+            self.maxHP = self.upgrades['hp']
+
 
 class GameSave:
     def __init__(self, islands, fire, water, air, lightening, combo, prvElement, currentIslandIndex, level, playerAtt):

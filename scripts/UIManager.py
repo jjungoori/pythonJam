@@ -260,6 +260,7 @@ class GameMenu:
 
             self.game.gameManager.playerAtt.upgrades[i] += 1
 
+            self.game.gameManager.playerAtt.adaptUpgrade()
             self.updateFromPlayer()
 
 
