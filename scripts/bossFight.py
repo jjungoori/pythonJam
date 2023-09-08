@@ -11,7 +11,7 @@ class BossManager:
         self.pattern = [0,0,0,1,2,3]
 
         self.bosses = [
-            Boss( 0, self.game.assets.images['boss1'], 1, 1, pattern=[
+            Boss( 0, 'entity/boss1', 1, 1, pattern=[
                 [0, 0, 0, 1, 1, 2], #1, 2, 3, 4 : elements, 5 damage, 6 time
                 [1, 0, 0, 0, 5, 10]
             ])
@@ -19,7 +19,8 @@ class BossManager:
 
     def start(self):
         self.boss = copy.deepcopy(self.bosses[self.type])
-        self.game.gameManager.objects.append(self.boss)
+        self.boss.object = GameObject(Animation(load_images(self.boss.animationPath), 10), (20,20))
+        self.game.gameManager.objects.append(self.boss.object)
         self.enable = True
 
     def playerAct(self, elements):
@@ -59,12 +60,15 @@ class BossManager:
 
 
 
-class Boss(GameObject):
-    def __init__(self, hp, animation, damage, speed, pattern):
-        super().__init__(animation, (20,20))
+class Boss:
+    def __init__(self, hp, animationPath, damage, speed, pattern):
+        # super().__init__(animation, (20,20))
 
         self.nowAct = 0
         self.hp = hp
         self.damage = damage
         self.speed = speed
         self.pattern = pattern
+        self.animationPath = animationPath
+
+        self.object = None

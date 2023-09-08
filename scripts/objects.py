@@ -12,6 +12,9 @@ class GameObject(pygame.sprite.Sprite):
         pygame.sprite.Sprite.__init__(self)
         self.pos = np.array(position, dtype=float)
 
+        self.objectScreenX = 0
+        self.objectScreenY = 0
+
         self.animation = animation
 
     def update(self):
@@ -27,9 +30,9 @@ class GameObject(pygame.sprite.Sprite):
         # scaledImageHeight = int(game_object.image.get_height() * zoomFactor)
         # scaledImage = pygame.transform.scale(game_object.image, (scaledImageWidth, scaledImageHeight))
 
-        objectScreenX = int(self.pos[0] - viewport.top)
-        objectScreenY = int(self.pos[1] - viewport.left)
-        screen.blit(self.animation.img(), (objectScreenX, objectScreenY))
+        self.objectScreenX = int(self.pos[0] - viewport.top)
+        self.objectScreenY = int(self.pos[1] - viewport.left)
+        screen.blit(self.animation.img(), (self.objectScreenX, self.objectScreenY))
 
 class Player(GameObject):
     def __init__(self, animation, position, game):

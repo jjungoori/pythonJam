@@ -7,6 +7,7 @@ from scripts.UIManager import *
 
 import os.path
 from os import path
+from scripts.bossFight import *
 
 
 
@@ -19,6 +20,7 @@ class Game:
         self.eventHandler = EventHandler(self)
         self.gameManager = GameManager(self)
         self.UIManager = UIManager(self)
+        self.bossManager = BossManager(self)
         self.timer = Timer()
         self.UITimer = Timer()
         self.bossTimer = Timer()

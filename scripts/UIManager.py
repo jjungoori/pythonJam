@@ -14,6 +14,8 @@ class UIManager:
         self.dialog = Dialog(self.game)
         self.dialogManager = DialogManager(self.game)
 
+        self.bossUI = BossUI(self.game)
+
         self.targetScrollOffset = 0
         self.scrollOffset = 0
         return
@@ -28,6 +30,8 @@ class UIManager:
         ]
 
     def render(self, zoomedScreen):
+
+        self.bossUI.render(zoomedScreen)
 
         leftBtns = [self.game.assets.images['ui/leftBtn.png'], self.game.assets.images['ui/leftBtnPressed.png']]
         rightBtns = [self.game.assets.images['ui/rightBtn.png'], self.game.assets.images['ui/rightBtnPressed.png']]
@@ -489,3 +493,31 @@ class Dialog:
     def addChar(self, char):
         self.text += char
         self.wrappedText = textWrap(self.text, self.game.assets.font, self.bg.get_width() - 50)
+
+
+class BossUI:
+    def __init__(self, game):
+        self.game = game
+        pass
+    def render(self, surf):
+        if not self.game.bossManager.enable:
+            return
+        pos = [self.game.bossManager.boss.object.objectScreenX, self.game.bossManager.boss.object.objectScreenY]
+
+        txt1 = self.game.assets.font.render(str(self.game.bossManager.pattern[0]), True, (200, 100, 100))
+        txt1Pos = pos + np.array((-5, -7))
+        surf.blit(txt1, np.array(txt1Pos)*self.game.gameManager.zoomFactor)
+
+        txt2 = self.game.assets.font.render(str(self.game.bossManager.pattern[1]), True, (100, 100, 200))
+        txt2Pos = txt1Pos + np.array(((txt1.get_width() + 10)/self.game.gameManager.zoomFactor, 0))
+        surf.blit(txt2, np.array(txt2Pos)*self.game.gameManager.zoomFactor)
+
+        txt3 = self.game.assets.font.render(str(self.game.bossManager.pattern[2]), True, (92, 154, 159))
+        txt3Pos = txt2Pos + np.array(((txt2.get_width() + 10)/self.game.gameManager.zoomFactor, 0))
+        surf.blit(txt3, np.array(txt3Pos)*self.game.gameManager.zoomFactor)
+
+        txt4 = self.game.assets.font.render(str(self.game.bossManager.pattern[3]), True, (160, 160, 100))
+        txt4Pos = txt3Pos + np.array(((txt3.get_width() + 10)/self.game.gameManager.zoomFactor, 0))
+        surf.blit(txt4, np.array(txt4Pos)*self.game.gameManager.zoomFactor)
+
+

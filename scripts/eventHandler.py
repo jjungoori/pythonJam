@@ -62,8 +62,8 @@ class EventHandler:
                     self.game.assets.sounds['save'].play()
                     self.game.gameManager.save()
                 if event.key == pygame.K_w:
-                    self.game.gameManager.playerAtt.hp += 1
                     print(self.game.gameManager.playerAtt.hp)
+                    self.game.bossManager.start()
 
             elif event.type == pygame.KEYUP:
                 if event.key == pygame.K_LEFT:
