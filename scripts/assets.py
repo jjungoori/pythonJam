@@ -14,6 +14,7 @@ class Assets:
 
         self.images = {
             'player/idle': Animation(load_images('entity/player'), img_dur=10),
+            'boss1' : Animation(load_images('entity/boss1'), img_dur=10),
             'ui/elements': load_images('ui/elements'),
             'ui/leftBtn.png': 0,
             'ui/rightBtn.png': 0,

@@ -167,6 +167,7 @@ class GameManager:
 
             self.game.timer.update()
             self.game.UITimer.update()
+            self.game.bossTimer.update()
 
             self.game.eventHandler.update()
 
@@ -258,9 +259,9 @@ class GameManager:
             self.combo += addedCombo
 
         else:
-            self.playerAttacked(1)
-            if self.playerAtt.hp <= 0:
-                self.playerAtt.hp = self.playerAtt.maxHP
+            print(self.playerAtt.barrier, self.playerAtt.isBarrier)
+            if not self.playerAtt.barrier:
+                self.playerAtt.barrier = self.playerAtt.isBarrier
 
                 if self.combo > 200:
                     self.game.assets.sounds['fail200'].play()
@@ -281,9 +282,12 @@ class GameManager:
                 self.combo = 0
 
                 self.prvElement = element
+
+            self.playerWrong()
+
         if self.combo == 0:
             self.prvElement = element
-            self.playerAtt.hp = self.playerAtt.maxHP
+            self.playerAtt.barrier = self.playerAtt.isBarrier
 
         return
 
@@ -328,9 +332,14 @@ class GameManager:
     #                         data['descriptions'][key])
     #     gmi.cost = data['costs'][key]
     #     self.items.append(gmi)
-    def playerAttacked(self, value):
+    def playerAttaked(self, value):
         self.playerAtt.hp -= value
         self.player[0].hpBarAlpha = 2000
+
+    def playerWrong(self):
+        self.playerAtt.barrier = False
+        #playsound
+
     def updateMenu(self):
         if self.game.UIManager.menuIndex == 0:
             self.game.UIManager.menu.updateFromMine(self.game.gameManager.currentIsland.currentObject)
@@ -361,14 +370,29 @@ class PlayerAtt:
     def __init__(self):
         self.hp = 1
         self.maxHP = 1
+        self.barrier = True
+        self.isBarrier = True
+
+        self.psychopath = False
+        self.reviver = False
+        self.attacker = False
 
         self.upgrades = {
-            'hp' : 1
+            'hp': 1
         }
 
     def adaptUpgrade(self):
         if 'hp' in self.upgrades:
             self.maxHP = self.upgrades['hp']
+
+        if 'reviver' in self.upgrades:
+            self.reviver = self.upgrades['reviver']
+
+        if 'psychopath' in self.upgrades:
+            self.psychopath = self.upgrades['psychopath']
+
+        if 'attacker' in self.upgrades:
+            self.attacker = self.upgrades['attacker']
 
 
 class GameSave:

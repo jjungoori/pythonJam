@@ -21,6 +21,7 @@ class Game:
         self.UIManager = UIManager(self)
         self.timer = Timer()
         self.UITimer = Timer()
+        self.bossTimer = Timer()
         self.upgradeAdapter = UpgradeAdapter(self)
 
         self.UIManager.run()
