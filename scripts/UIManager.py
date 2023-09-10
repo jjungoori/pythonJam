@@ -377,7 +377,7 @@ class GameMenu:
 
             temp = partial(self.tempPlayer, data['costs'][key], i)  # !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 
-            if len(data['costs']) - 1 > key:
+            if len(data['costs'])  > key:
                 if self.game.gameManager.fire >= data['costs'][key][0] and self.game.gameManager.water >= data['costs'][key][1] and self.game.gameManager.air >= data['costs'][key][2] and self.game.gameManager.lightening >= data['costs'][key][3]:
                     btn = ImageButton([self.game.assets.images['ui/smallBtn.png'], self.game.assets.images['ui/smallBtnPressed.png']],
                                       (0, 0), temp)
@@ -502,22 +502,62 @@ class BossUI:
     def render(self, surf):
         if not self.game.bossManager.enable:
             return
-        pos = [self.game.bossManager.boss.object.objectScreenX, self.game.bossManager.boss.object.objectScreenY]
+        pos = [self.game.bossManager.boss.object.objectScreenX+8, self.game.bossManager.boss.object.objectScreenY]
 
-        txt1 = self.game.assets.font.render(str(self.game.bossManager.pattern[0]), True, (200, 100, 100))
-        txt1Pos = pos + np.array((-5, -7))
+        txt1 = self.game.assets.font.render(str(max(self.game.bossManager.pattern[0],0)), True, (200, 100, 100))
+        txt1Pos = pos + np.array((-5, -13))
         surf.blit(txt1, np.array(txt1Pos)*self.game.gameManager.zoomFactor)
 
-        txt2 = self.game.assets.font.render(str(self.game.bossManager.pattern[1]), True, (100, 100, 200))
+        txt2 = self.game.assets.font.render(str(max(self.game.bossManager.pattern[1],0)), True, (100, 100, 200))
         txt2Pos = txt1Pos + np.array(((txt1.get_width() + 10)/self.game.gameManager.zoomFactor, 0))
         surf.blit(txt2, np.array(txt2Pos)*self.game.gameManager.zoomFactor)
 
-        txt3 = self.game.assets.font.render(str(self.game.bossManager.pattern[2]), True, (92, 154, 159))
+        txt3 = self.game.assets.font.render(str(max(self.game.bossManager.pattern[2],0)), True, (92, 154, 159))
         txt3Pos = txt2Pos + np.array(((txt2.get_width() + 10)/self.game.gameManager.zoomFactor, 0))
         surf.blit(txt3, np.array(txt3Pos)*self.game.gameManager.zoomFactor)
 
-        txt4 = self.game.assets.font.render(str(self.game.bossManager.pattern[3]), True, (160, 160, 100))
+        txt4 = self.game.assets.font.render(str(max(self.game.bossManager.pattern[3],0)), True, (160, 160, 100))
         txt4Pos = txt3Pos + np.array(((txt3.get_width() + 10)/self.game.gameManager.zoomFactor, 0))
         surf.blit(txt4, np.array(txt4Pos)*self.game.gameManager.zoomFactor)
+
+        #------ timecool bar ------
+
+        dispPos = pos
+
+        tPercent = self.game.bossTimer.remainingTimePercent(0)
+
+        tBarWidth = 54
+        tBarHeight = 9
+
+        tX = dispPos[0] - tBarWidth / 2 + 26
+        tY = dispPos[1] - tBarHeight / 2 - 1
+
+        tBarSurface = pygame.Surface((tBarWidth, tBarHeight), pygame.SRCALPHA)
+
+        tBarSurface.fill((0, 0, 0, 0))  # Clear surface
+        pygame.draw.rect(tBarSurface, (0, 0, 0, 255), (0, 0, tBarWidth, tBarHeight))
+        pygame.draw.rect(tBarSurface, (100, 200, 100, 255),
+                         (0, 0, tBarWidth * tPercent, tBarHeight))
+        surf.blit(tBarSurface, np.array((tX, tY)) * self.game.gameManager.zoomFactor)
+
+        #------ hp bar ------------
+
+        # dispPos = [self.game.bossManager.boss.object.objectScreenX, self.game.bossManager.boss.object.objectScreenY]
+
+        hpPercent = self.game.bossManager.hp / self.game.bossManager.boss.hp
+
+        hpBarWidth = 54
+        hpBarHeight = 9
+
+        hpX = dispPos[0] - hpBarWidth / 2 + 26
+        hpY = dispPos[1] - hpBarHeight / 2 + 1
+
+        hpBarSurface = pygame.Surface((hpBarWidth, hpBarHeight), pygame.SRCALPHA)
+
+        hpBarSurface.fill((0, 0, 0, 0))  # Clear surface
+        pygame.draw.rect(hpBarSurface, (0, 0, 0, 255), (0, 0, hpBarWidth, hpBarHeight))
+        pygame.draw.rect(hpBarSurface, (200, 100, 100, 255),
+                         (0, 0, hpBarWidth * hpPercent, hpBarHeight))
+        surf.blit(hpBarSurface, np.array((hpX, hpY))*self.game.gameManager.zoomFactor)
 
 

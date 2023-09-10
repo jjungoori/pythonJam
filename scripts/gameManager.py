@@ -271,12 +271,17 @@ class GameManager:
                 addEle = self.combo
                 if self.prvElement == 0:
                     self.fire += addEle
+                    self.game.bossManager.playerAct([addEle, 0,0,0,0])
                 elif self.prvElement == 1:
                     self.water += addEle
+                    self.game.bossManager.playerAct([0, addEle, 0, 0,0])
                 elif self.prvElement == 2:
                     self.air += addEle
+                    self.game.bossManager.playerAct([0, 0,addEle,  0,0])
                 elif self.prvElement == 3:
                     self.lightening += addEle
+                    self.game.bossManager.playerAct([0, 0, 0, addEle,0])
+
 
                 self.game.renderer.shakeScreen(min(self.combo / 10, 300))
                 self.combo = 0
@@ -333,6 +338,7 @@ class GameManager:
     #     gmi.cost = data['costs'][key]
     #     self.items.append(gmi)
     def playerAttaked(self, value):
+        print(self.playerAtt.hp, value)
         self.playerAtt.hp -= value
         self.player[0].hpBarAlpha = 2000
 
@@ -384,6 +390,7 @@ class PlayerAtt:
     def adaptUpgrade(self):
         if 'hp' in self.upgrades:
             self.maxHP = self.upgrades['hp']
+            self.hp = self.maxHP
 
         if 'reviver' in self.upgrades:
             self.reviver = self.upgrades['reviver']

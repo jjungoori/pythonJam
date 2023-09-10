@@ -1,3 +1,5 @@
+import pygame.mixer
+
 from scripts.utils import *
 
 class Assets:
@@ -14,7 +16,8 @@ class Assets:
 
         self.images = {
             'player/idle': Animation(load_images('entity/player'), img_dur=10),
-            'boss1' : Animation(load_images('entity/boss1'), img_dur=10),
+            'boss1' : Animation(load_images('entity/boss1'), img_dur=20),
+            'boss2': Animation(load_images('entity/boss2'), img_dur=20),
             'ui/elements': load_images('ui/elements'),
             'ui/leftBtn.png': 0,
             'ui/rightBtn.png': 0,
@@ -40,7 +43,11 @@ class Assets:
             'fail50': pygame.mixer.Sound('resources/sound/fail50.wav'),
             'fail200': pygame.mixer.Sound('resources/sound/fail200.wav'),
             'change': pygame.mixer.Sound('resources/sound/change.wav'),
-            'save' : pygame.mixer.Sound('resources/sound/save.wav')
+            'save' : pygame.mixer.Sound('resources/sound/save.wav'),
+            'die' : pygame.mixer.Sound('resources/sound/die.wav'),
+            'kill' : pygame.mixer.Sound('resources/sound/kill.wav'),
+            'res' : pygame.mixer.Sound('resources/sound/res.wav'),
+            'bossSpawn' : pygame.mixer.Sound('resources/sound/bossSpawn.wav')
         }
 
 

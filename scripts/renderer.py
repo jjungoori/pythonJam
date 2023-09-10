@@ -1,6 +1,8 @@
 import random
 import numpy as np
 from scripts.utils import *
+from functools import partial
+
 
 
 class Renderer:
@@ -12,6 +14,7 @@ class Renderer:
         self.display = pygame.Surface((SCREEN_WIDTH, SCREEN_HEIGHT))
         self.shake = 10
         self.game = game
+        self.fadeINOUT = 0
         # self.vignette = True
         # self.targetPos = self.game.gameManager.player.pos
         self.camTarget = 0 # 0 : player, 1 : free
@@ -52,6 +55,10 @@ class Renderer:
             i.update()
             i.render(self.display, self.game.gameManager.viewport)
             # print(i)
+        if self.game.bossManager.enable:
+            self.game.bossManager.boss.object.update()
+            self.game.bossManager.boss.object.render(self.display, self.game.gameManager.viewport)
+
         for i in self.game.gameManager.particles:
             if i.update():
                 i.render(self.display, self.game.gameManager.viewport, 1, 1)
@@ -76,10 +83,30 @@ class Renderer:
         # ------------------UI------------------
         self.game.UIManager.render(zoomedScreen)
         #---------------------------------------
+        #----
+        if self.fadeINOUT > 0 :
+            translucentMask = pygame.Surface(zoomedScreen.get_size(), pygame.SRCALPHA)
+            translucentColor = (0, 0, 0, self.fadeINOUT)
+            translucentMask.fill(translucentColor)
+            zoomedScreen.blit(translucentMask, (0, 0))
+        #----
         self.screen.blit(zoomedScreen, (0, 0))
+
+
         pygame.display.update()
 
     def shakeScreen(self, intensity):
         if intensity > self.shake:
             self.shake = intensity
 
+    def fadeInAndOut(self):
+        self.fadeINOUT = 0
+        for i in range(255):
+            self.game.timer.add(3 * i, partial(self.setFade, i))
+        for i in range(255):
+            self.game.timer.add(255 * 3 + 3 * i, partial(self.setFade, 255-i))
+        print("fade")
+
+    def setFade(self, v):
+        self.fadeINOUT = v
+        print(v)

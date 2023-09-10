@@ -6,12 +6,19 @@ class Timer:
 
     def add(self, delay, callback):
         targetTime = pygame.time.get_ticks() + delay
-        self.timers.append((targetTime, callback))
+        self.timers.append((targetTime, callback, pygame.time.get_ticks()))
 
     def update(self):
         currentTime = pygame.time.get_ticks()
         for timer in self.timers.copy():
-            targetTime, callback = timer
+            targetTime, callback, _ = timer
             if currentTime >= targetTime:
                 callback()
-                self.timers.remove(timer)
+                if timer in self.timers:
+                    self.timers.remove(timer)
+
+    def remainingTimePercent(self, index):
+        if index < len(self.timers):
+            t = self.timers[index]
+
+            return (t[0] - pygame.time.get_ticks())/(t[0] - t[2])

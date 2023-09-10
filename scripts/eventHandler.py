@@ -64,18 +64,23 @@ class EventHandler:
                 if event.key == pygame.K_w:
                     print(self.game.gameManager.playerAtt.hp)
                     self.game.bossManager.start()
+                # if event.key == pygame.K_p:
+                #     self.game.UIManager.dialogManager.setDialog("""test
+                #     yong
+                #     dialog""")
+                #     self.game.UIManager.dialogManager.next()
 
             elif event.type == pygame.KEYUP:
                 if event.key == pygame.K_LEFT:
                     self.up()
                 if event.key == pygame.K_RIGHT:
                     self.up()
-                if event.key == pygame.K_UP:
-                    self.game.gameManager.movement[2] = False
-                    pass
-                if event.key == pygame.K_DOWN:
-                    self.game.gameManager.movement[3] = False
-                    pass
+                # if event.key == pygame.K_UP:
+                #     self.game.gameManager.movement[2] = False
+                #     pass
+                # if event.key == pygame.K_DOWN:
+                #     self.game.gameManager.movement[3] = False
+                #     pass
 
 
                     # targetZoom += 0.5
