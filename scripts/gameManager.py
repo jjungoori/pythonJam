@@ -300,13 +300,19 @@ class GameManager:
     def changeAct(self, *args):
         self.game.assets.sounds['change'].play()
         self.action += 1
+
+        if self.action > 2 or (self.action > 1 and self.game.bossManager.enable):
+            self.action = 0
+
         if self.action == 2:
             self.updateMenu()
             self.game.UIManager.menu.on = True
         else:
             self.game.UIManager.menu.on = False
-        if self.action > 2:
-            self.action = 0
+
+
+
+        print("action : ", self.action)
         # self.game.UIManager.menu.changeAct(self.action)
 
 

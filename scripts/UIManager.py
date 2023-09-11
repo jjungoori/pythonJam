@@ -36,7 +36,7 @@ class UIManager:
         leftBtns = [self.game.assets.images['ui/leftBtn.png'], self.game.assets.images['ui/leftBtnPressed.png']]
         rightBtns = [self.game.assets.images['ui/rightBtn.png'], self.game.assets.images['ui/rightBtnPressed.png']]
 
-        dummy = self.game.assets.images['ui/leftBtn.png']
+        # dummy = self.game.assets.images['ui/leftBtn.png']
         ti = leftBtns[self.game.eventHandler.left]
         zoomedScreen.blit(ti, colCenter(ti, bottom(ti, (0, 0))) + np.array((-130, -20)))
         ti = rightBtns[self.game.eventHandler.right]

@@ -33,6 +33,9 @@ class BossManager:
         self.game.assets.sounds['bossSpawn'].play()
         # self.game.gameManager.objects.append(self.boss.object)
 
+        if self.game.gameManager.action == 2:
+            self.game.gameManager.changeAct()
+
 
         self.enable = True
 
