@@ -84,7 +84,7 @@ class Renderer:
         self.game.UIManager.render(zoomedScreen)
         #---------------------------------------
         #----
-        if self.fadeINOUT > 0 :
+        if self.fadeINOUT > 1 :
             translucentMask = pygame.Surface(zoomedScreen.get_size(), pygame.SRCALPHA)
             translucentColor = (0, 0, 0, self.fadeINOUT)
             translucentMask.fill(translucentColor)

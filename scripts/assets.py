@@ -19,6 +19,7 @@ class Assets:
             'boss1' : Animation(load_images('entity/boss1'), img_dur=20),
             'boss2': Animation(load_images('entity/boss2'), img_dur=20),
             'ui/elements': load_images('ui/elements'),
+            'barrier' : load_image('barrier.png'),
             'ui/leftBtn.png': 0,
             'ui/rightBtn.png': 0,
             'ui/scrollMask.png': 0,
@@ -30,7 +31,7 @@ class Assets:
             'ui/UIBG.png': 0,
             'ui/smallBtn.png': 0,
             'ui/smallBtnPressed.png': 0,
-            'ui/dialog.png' : 0
+            'ui/dialog.png' : 0,
             # 'ui/upgradeAdd' : 1
         }
         self.imagePreprocess()
@@ -47,7 +48,9 @@ class Assets:
             'die' : pygame.mixer.Sound('resources/sound/die.wav'),
             'kill' : pygame.mixer.Sound('resources/sound/kill.wav'),
             'res' : pygame.mixer.Sound('resources/sound/res.wav'),
-            'bossSpawn' : pygame.mixer.Sound('resources/sound/bossSpawn.wav')
+            'bossSpawn' : pygame.mixer.Sound('resources/sound/bossSpawn.wav'),
+            'hitHurt' : pygame.mixer.Sound('resources/sound/hitHurt.wav'),
+            'barrier' : pygame.mixer.Sound('resources/sound/barrier.wav')
         }
 
 

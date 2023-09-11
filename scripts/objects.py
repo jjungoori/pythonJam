@@ -43,6 +43,12 @@ class Player(GameObject):
     def render(self, screen, viewport):
         dispPos = self.pos - (viewport.top, viewport.left)
         screen.blit(self.animation.img(), dispPos)
+        #---
+
+        if self.game.gameManager.playerAtt.barrier:
+            screen.blit(self.game.assets.images['barrier'], dispPos)
+
+        #---
 
         hpPercent = self.game.gameManager.playerAtt.hp / self.game.gameManager.playerAtt.maxHP
 
@@ -55,8 +61,8 @@ class Player(GameObject):
         hpBarSurface = pygame.Surface((hpBarWidth, hpBarHeight), pygame.SRCALPHA)
 
         hpBarSurface.fill((0, 0, 0, 0))  # Clear surface
-        pygame.draw.rect(hpBarSurface, (255, 0, 0, min(self.hpBarAlpha, 255)), (0, 0, hpBarWidth, hpBarHeight))
-        pygame.draw.rect(hpBarSurface, (0, 255, 0, min(self.hpBarAlpha, 255)), (0, 0, hpBarWidth * hpPercent, hpBarHeight))
+        pygame.draw.rect(hpBarSurface, (0, 0, 0, min(self.hpBarAlpha, 255)), (0, 0, hpBarWidth, hpBarHeight))
+        pygame.draw.rect(hpBarSurface, (200, 100, 100, min(self.hpBarAlpha, 255)), (0, 0, hpBarWidth * hpPercent, hpBarHeight))
         screen.blit(hpBarSurface, (hpX, hpY))
 
         self.hpBarAlpha *= 0.9

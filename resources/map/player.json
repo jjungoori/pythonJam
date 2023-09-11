@@ -5,6 +5,12 @@
       "costs" : [[100, 0, 0, 0], [0, 100, 0, 0], [0, 0, 100, 0], [0, 0, 0, 100]],
       "infinity" : 1
     },
+    "barrier" : {
+      "title" : "Barrier",
+      "description" :  "Forgive a mistake",
+      "costs" : [[200,200,200,200]],
+      "infinity" : 0
+    },
     "reviver" : {
       "title" : "The Reviver",
       "description" :  "When you revive from the death, you get Extra resources in proportion the HP",
@@ -21,6 +27,12 @@
       "title" : "The Psychopath",
       "description" :  "Get X 10 resources but you may be a little strange",
       "costs" : [[1000,1000,1000,1000]],
+      "infinity" : 0
+    },
+    "tbc" : {
+      "title" : "TO BE CONTINUED",
+      "description" :  "Thank U 4 Playing",
+      "costs" : [[99999,99999,99999,99999]],
       "infinity" : 0
     }
 }

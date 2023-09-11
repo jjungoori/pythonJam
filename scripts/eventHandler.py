@@ -27,7 +27,7 @@ class EventHandler:
                 pygame.quit()
                 sys.exit()
             elif event.type == pygame.MOUSEBUTTONDOWN:
-                b = self.game.UIManager.dialog.update()
+                b = self.game.UIManager.dialog.update() and self.game.UIManager.dialog.on
                 a = self.game.UIManager.uiEvent()
                 if b:
                     continue
@@ -61,9 +61,7 @@ class EventHandler:
                 if event.key == pygame.K_q:
                     self.game.assets.sounds['save'].play()
                     self.game.gameManager.save()
-                if event.key == pygame.K_w:
-                    print(self.game.gameManager.playerAtt.hp)
-                    self.game.bossManager.start()
+
                 # if event.key == pygame.K_p:
                 #     self.game.UIManager.dialogManager.setDialog("""test
                 #     yong

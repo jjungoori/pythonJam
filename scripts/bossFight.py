@@ -6,24 +6,20 @@ class BossManager:
     def __init__(self, game):
         self.game = game
         self.enable = False
-        self.type = 1
+        self.type = 0
         self.boss = None
         self.pattern = [0,0,0,1,2]
         self.hp = 0
 
-        self.bosses = [
-            Boss( 5, 'entity/boss1', 1, 1, [
-                [10, 0, 0, 0, 10], #1, 2, 3, 4 : elements, 5 : time
-                [0, 10, 0, 0, 10]
-            ], 'reviver'),
-            Boss(5, 'entity/boss2', 1, 1, [
-                [10, 0, 0, 1, 5],  # 1, 2, 3, 4 : elements, 5 : time
-                [20, 0, 0, 0, 10],
-                [30, 0, 0, 0, 10]
-            ], 'psychopath')
-        ]
+        self.bosses = self.game.gameManager.bosses
 
-    def start(self):
+    def load(self):
+        self.bosses = self.game.gameManager.bosses
+
+    def start(self, type = -1):
+        if type != -1:
+            self.type = type
+
         self.game.gameManager.combo = 0
         self.boss = copy.deepcopy(self.bosses[self.type])
         self.hp = self.boss.hp
@@ -44,7 +40,11 @@ class BossManager:
             if sum(elements) < 10:
                 self.game.assets.sounds['res'].play()
                 return
+
             self.hp -= sum(elements)
+            if self.game.gameManager.playerAtt.attacker:
+                self.hp -= sum(elements)
+
             self.pattern -= np.array(elements)
             if self.pattern[0] <= 0 and self.pattern[1] <= 0 and self.pattern[2] <= 0 and self.pattern[3] <= 0:
 
@@ -63,8 +63,11 @@ class BossManager:
         #attack
         self.game.gameManager.playerAttaked(sum(self.pattern)-self.pattern[4])
         self.nextPattern()
+        self.game.assets.sounds['hitHurt'].play()
         print("attacked")
         if self.game.gameManager.playerAtt.hp <= 0:
+            if self.game.gameManager.playerAtt.reviver:
+                self.game.gameManager.combo += self.game.gameManager.playerAtt.hp
             self.game.gameManager.playerAtt.hp = self.game.gameManager.playerAtt.maxHP
             self.fail()
 
@@ -89,7 +92,7 @@ class BossManager:
         self.game.renderer.fadeInAndOut()
 
     def win(self):
-
+        self.bosses[self.type].defeat = 1
         print("g")
         self.game.assets.sounds['kill'].play()
         self.enable = False
@@ -113,8 +116,11 @@ class BossManager:
 
 
 class Boss:
-    def __init__(self, hp, animationPath, damage, speed, pattern, reward):
+    def __init__(self,name, hp, animationPath, damage, speed, pattern, reward):
         # super().__init__(animation, (20,20))
+
+        self.name = name
+        self.defeat = 0
 
         self.nowAct = 0
         self.hp = hp
@@ -125,3 +131,13 @@ class Boss:
         self.reward = reward
 
         self.object = None
+
+    def __getstate__(self):
+        state = self.__dict__.copy()
+
+        delState = ['object']
+        for i in delState:
+            if i in state:
+                del state[i]
+
+        return state

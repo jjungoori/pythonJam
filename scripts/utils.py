@@ -5,8 +5,11 @@ from scripts.constants import *
 
 
 def load_image(path):
-    img = pygame.image.load(BASE_IMG_PATH + path).convert()
-    img.set_colorkey((0, 0, 0))
+    if path.endswith(".png"):
+        img = pygame.image.load(BASE_IMG_PATH + path).convert_alpha()
+    else:
+        img = pygame.image.load(BASE_IMG_PATH + path).convert()
+        img.set_colorkey((0, 0, 0))
     return img
 
 

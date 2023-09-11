@@ -6,6 +6,7 @@ import json
 from scripts.tiles import *
 from  scripts.timer import *
 import time
+from scripts.bossFight import *
 
 class GameManager:
 
@@ -72,6 +73,56 @@ class GameManager:
 
         self.level = 0
 
+        self.bosses = [
+            Boss("Shadow", 20, 'entity/boss1', 1, 1, [
+                [10, 0, 0, 0, 10], #1, 2, 3, 4 : elements, 5 : time
+                [0, 10, 0, 0, 10]
+            ], 'barrier'),
+            Boss("Skelkel", 30, 'entity/boss2', 1, 1, [
+                [10, 0, 0, 1, 5],  # 1, 2, 3, 4 : elements, 5 : time
+                [20, 0, 0, 0, 10],
+                [30, 0, 0, 0, 10]
+            ], 'reviver'),
+            Boss("Shathowy", 50, 'entity/boss1', 1, 1, [
+                [1, 0, 0, 1, 10],  # 1, 2, 3, 4 : elements, 5 : time
+                [0, 1, 0, 0, 0.1],
+                [0, 0, 1, 0, 0.1],
+                [0, 0, 0, 1, 0.1],
+                [0, 1, 0, 0, 0.1],
+                [0, 0, 1, 0, 0.1],
+                [0, 0, 0, 1, 0.1],
+                [0, 1, 0, 0, 0.1],
+                [0, 0, 1, 0, 0.1],
+                [0, 0, 0, 1, 0.1],
+                [0, 1, 0, 0, 0.1],
+                [0, 0, 1, 0, 0.1],
+                [0, 0, 0, 1, 0.1],
+            ], 'attacker'),
+            Boss("Skelkelkel", 70, 'entity/boss2', 1, 1, [
+                [1, 0, 0, 0, 0.1],  # 1, 2, 3, 4 : elements, 5 : time
+                [0, 1, 0, 0, 0.1],
+                [0, 0, 1, 0, 0.1],
+                [0, 0, 0, 1, 0.1],
+                [0, 1, 0, 0, 0.1],
+                [0, 0, 1, 0, 0.1],
+                [0, 0, 0, 1, 0.1],
+                [0, 1, 0, 0, 0.1],
+                [0, 0, 1, 0, 0.1],
+                [0, 0, 0, 1, 0.1],
+                [0, 1, 0, 0, 0.1],
+                [0, 0, 1, 0, 0.1],
+                [0, 0, 0, 1, 0.1],
+            ], 'psychopath'),
+            Boss("ShToHWYe@", 100, 'entity/boss1', 1, 1, [
+                [1, 1, 1, 0, 10],  # 1, 2, 3, 4 : elements, 5 : time
+                [0, 0, 0, 10, 0.1],
+                [0, 0, 0, 10, 0.1],
+                [0, 0, 0, 10, 0.1],
+                [0, 0, 0, 10, 0.1],
+                [0, 0, 0, 10, 0.1],
+            ], 'tbc'),
+        ]
+
     def newGame(self):
 
         # self.tilemaps['main'].loadFromCsv('map/firstIsland.csv')
@@ -105,18 +156,19 @@ class GameManager:
         곡괭이, 신발, 화살표 모양을 가진 버튼 세가지 상태가 플레이어의 기본 상태라 할 수 있겠습니다.
         이상으로 튜토리얼을 마치겠습니다.""")
         self.game.UIManager.dialogManager.next()
+        self.playerAtt.adaptUpgrade()
 
     def loadSave(self, saveFilePath):
         with open(saveFilePath, 'rb') as file:
             save = pickle.load(file)
-        self.islands, self.fire, self.water, self.air, self.lightening, self.combo, self.prvElement,self.currentIslandIndex, self.level, self.playerAtt = save.islands, save.fire, save.water, save.air, save.lightening, save.combo, save.prvElement, save.currentIslandIndex, save.level, save.playerAtt
+        self.islands, self.fire, self.water, self.air, self.lightening, self.combo, self.prvElement,self.currentIslandIndex, self.level, self.playerAtt, self.bosses = save.islands, save.fire, save.water, save.air, save.lightening, save.combo, save.prvElement, save.currentIslandIndex, save.level, save.playerAtt, save.bosses
 
         for i in self.islands:
             for l in i.objects:
                 l.load(self.game)
     def save(self):
         gameSave = GameSave(self.islands, self.fire, self.water,
-                            self.air, self.lightening, self.combo, self.prvElement, self.currentIslandIndex, self.level, self.playerAtt)
+                            self.air, self.lightening, self.combo, self.prvElement, self.currentIslandIndex, self.level, self.playerAtt, self.bosses)
         with open('save.pkl', 'wb') as file:
             pickle.dump(gameSave, file)
 
@@ -219,6 +271,8 @@ class GameManager:
                     self.game.gameManager.player[0].pos = np.array(
                         tilePosToPos(targetObject.pos + np.array(targetObject.playerOffsetPos[1], dtype=float)))
         elif self.action == 2:
+            self.game.UIManager.scrollOffset = 0
+            self.game.UIManager.targetScrollOffset = 0
             if(args[0] == 1):
                 self.game.UIManager.menuIndex += 1
                 if self.game.UIManager.menuIndex > 2:
@@ -350,6 +404,7 @@ class GameManager:
 
     def playerWrong(self):
         self.playerAtt.barrier = False
+        self.game.assets.sounds['barrier'].play()
         #playsound
 
     def updateMenu(self):
@@ -359,6 +414,8 @@ class GameManager:
             self.game.UIManager.menu.updateFromPlayer()
         elif self.game.UIManager.menuIndex == 2:
             self.game.UIManager.menu.updateFromNew(self.game.gameManager.currentIsland)
+        elif self.game.UIManager.menuIndex == 3:
+            self.game.UIManager.menu.updateFromBoss()
 
     def spawnNewIsland(self):
         # print(self.currentIsland.end)
@@ -382,9 +439,9 @@ class PlayerAtt:
     def __init__(self):
         self.hp = 1
         self.maxHP = 1
-        self.barrier = True
-        self.isBarrier = True
+        self.barrier = False
 
+        self.isBarrier = False
         self.psychopath = False
         self.reviver = False
         self.attacker = False
@@ -395,8 +452,12 @@ class PlayerAtt:
 
     def adaptUpgrade(self):
         if 'hp' in self.upgrades:
-            self.maxHP = self.upgrades['hp']
+            self.maxHP = self.upgrades['hp']*3
             self.hp = self.maxHP
+
+        if 'barrier' in self.upgrades and self.upgrades['barrier'] >= 1:
+            self.isBarrier = True
+            self.barrier = True
 
         if 'reviver' in self.upgrades:
             self.reviver = self.upgrades['reviver']
@@ -409,7 +470,7 @@ class PlayerAtt:
 
 
 class GameSave:
-    def __init__(self, islands, fire, water, air, lightening, combo, prvElement, currentIslandIndex, level, playerAtt):
+    def __init__(self, islands, fire, water, air, lightening, combo, prvElement, currentIslandIndex, level, playerAtt, bosses):
         self.islands = islands
         self.fire = fire
         self.water = water
@@ -420,3 +481,4 @@ class GameSave:
         self.currentIslandIndex = currentIslandIndex
         self.level = level
         self.playerAtt = playerAtt
+        self.bosses = bosses

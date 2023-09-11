@@ -34,6 +34,7 @@ class Game:
             self.gameManager.newGame()
 
         self.gameManager.run()
+        self.bossManager.load()
 
 
 if __name__ == "__main__":

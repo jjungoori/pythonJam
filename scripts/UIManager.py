@@ -165,6 +165,8 @@ class GameMenuItems:
         self.description = description
         self.cost = [0, 0, 0, 0]
 
+        self.costAble = 1
+
     def render(self, zoomedScreen, bgPos):
         txtHeight = 0
 
@@ -184,21 +186,22 @@ class GameMenuItems:
             self.button.fixColl()
             zoomedScreen.blit(self.button.image, btnPos)
 
-            txt1 = self.game.assets.font.render(str(self.cost[0]), True, (200, 100, 100))
-            txt1Pos = bgPos + np.array((40, txtHeight + 10))
-            zoomedScreen.blit(txt1, txt1Pos)
+            if self.costAble:
+                txt1 = self.game.assets.font.render(str(self.cost[0]), True, (200, 100, 100))
+                txt1Pos = bgPos + np.array((40, txtHeight + 10))
+                zoomedScreen.blit(txt1, txt1Pos)
 
-            txt2 = self.game.assets.font.render(str(self.cost[1]), True, (100, 100, 200))
-            txt2Pos = txt1Pos + np.array((txt1.get_width() + 10, 0))
-            zoomedScreen.blit(txt2, txt2Pos)
+                txt2 = self.game.assets.font.render(str(self.cost[1]), True, (100, 100, 200))
+                txt2Pos = txt1Pos + np.array((txt1.get_width() + 10, 0))
+                zoomedScreen.blit(txt2, txt2Pos)
 
-            txt3 = self.game.assets.font.render(str(self.cost[2]), True, (92, 154, 159))
-            txt3Pos = txt2Pos + np.array((txt2.get_width() + 10, 0))
-            zoomedScreen.blit(txt3, txt3Pos)
+                txt3 = self.game.assets.font.render(str(self.cost[2]), True, (92, 154, 159))
+                txt3Pos = txt2Pos + np.array((txt2.get_width() + 10, 0))
+                zoomedScreen.blit(txt3, txt3Pos)
 
-            txt4 = self.game.assets.font.render(str(self.cost[3]), True, (160, 160, 100))
-            txt4Pos = txt3Pos + np.array((txt3.get_width() + 10, 0))
-            zoomedScreen.blit(txt4, txt4Pos)
+                txt4 = self.game.assets.font.render(str(self.cost[3]), True, (160, 160, 100))
+                txt4Pos = txt3Pos + np.array((txt3.get_width() + 10, 0))
+                zoomedScreen.blit(txt4, txt4Pos)
 
             txtHeight += 60
 
@@ -292,6 +295,16 @@ class GameMenu:
     def changeAct(self, num):
         self.game.gameManager.changeAct()
         return
+    def bosstuto(self):
+        self.game.UIManager.dialogManager.setDialog("""보스 튜토리얼 / 예상 소요시간 : 20초 / *터치*
+        보스는 이 게임의 추가적인 목표로 보스를 잡음으로써 플레이어는 새로운 특성을 얻을 수 있습니다.
+        일단 보스를 잡기 위해서는 보스의 피를 0으로 만들면 됩니다. 보스의 피는 빨간색 바로 표시됩니다.
+        보스의 피를 깎기 위해서 플레이어는 채광을 할 수 있으며, 이 때 어떤 원소를 채집하는지는 상관이 없습니다.
+        다만 보스는 일정 시간마다 공격을 하게 되며 보스 위에 나타난 원소를 맞춰 공격하면 보스의 공격을 멈출 수 있습니다. 이때 보스의 공격은 초록색 바로 표시됩니다.
+        보스의 공격을 맞을 경우 플레이어가 사망하게 되며 보스 토벌에 실패하기 때문에 보스의 피를 빠르게 깎음과 동시에 보스의 공격을 저지하는 것이 가장 좋은 전략입니다.
+        이렇게 해서 보스를 잡으면 앞서 설명한 것과 같이 보스를 토벌해 새로운 특성을 얻을 수 있습니다.
+        이상입니다.""")
+        self.game.UIManager.dialogManager.next()
 
 
     def updateFromMine(self, mine):
@@ -375,9 +388,11 @@ class GameMenu:
                     data['costs'][key][l] *= mul
                     print(data['costs'][key][l])
 
-            temp = partial(self.tempPlayer, data['costs'][key], i)  # !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+            gc = [0,0,0,0]
 
             if len(data['costs'])  > key:
+                gc = data['costs'][key]
+                temp = partial(self.tempPlayer, data['costs'][key], i)  # !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
                 if self.game.gameManager.fire >= data['costs'][key][0] and self.game.gameManager.water >= data['costs'][key][1] and self.game.gameManager.air >= data['costs'][key][2] and self.game.gameManager.lightening >= data['costs'][key][3]:
                     btn = ImageButton([self.game.assets.images['ui/smallBtn.png'], self.game.assets.images['ui/smallBtnPressed.png']],
                                       (0, 0), temp)
@@ -391,12 +406,12 @@ class GameMenu:
             gmi = GameMenuItems(self.game, 0,
                                             btn, data['title'],
                                             data['description'])
-            gmi.cost = data['costs'][key]
+            gmi.cost = gc
             self.items.append(gmi)
 
 
     def updateFromNew(self, island):
-        self.title = "New Island"
+        self.title = "Specials"
         self.items = [
 
         ]
@@ -429,6 +444,50 @@ class GameMenu:
         gmi.cost = cost
         self.items.append(gmi)
 
+        def setBossMenu():
+            self.game.UIManager.menuIndex = 3
+            self.game.gameManager.updateMenu()
+
+        gmi = GameMenuItems(self.game, None,
+                            ImageButton(
+                                [self.game.assets.images['ui/smallBtn.png'],
+                                 self.game.assets.images['ui/smallBtnPressed.png']],
+                                (0, 0), setBossMenu), "Boss?",
+                            "Show list of bosses")
+        gmi.costAble = 0
+        self.items.append(gmi)
+
+    def updateFromBoss(self):
+        self.title = "Bosses"
+        self.items = [
+
+        ]
+
+        gmi = GameMenuItems(self.game, 0,
+                            ImageButton(
+                                [self.game.assets.images['ui/smallBtn.png'],
+                                 self.game.assets.images['ui/smallBtnPressed.png']],
+                                (0, 0), self.bosstuto), "Tutorial",
+                            "Are you new to here?")
+        self.items.append(gmi)
+        for i in range(len(self.game.bossManager.bosses)):
+
+
+            temp = partial(self.game.bossManager.start, i)
+
+            btn = ImageButton(
+                [self.game.assets.images['ui/smallBtn.png'], self.game.assets.images['ui/smallBtnPressed.png']],
+                (0, 0), temp)
+
+            des = "unknown"
+            if self.game.bossManager.bosses[i].defeat:
+                des = "CLEARED"
+
+            gmi = GameMenuItems(self.game, 0,
+                                            btn, self.game.bossManager.bosses[i].name,
+                                            des)
+            gmi.costAble = 0
+            self.items.append(gmi)
 
 class Dialog:
     def __init__(self, game):
